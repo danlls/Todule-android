@@ -1,7 +1,9 @@
-package com.example.daniel.todule_android;
+package com.example.daniel.todule_android.activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.example.daniel.todule_android.R;
 
 public class MainActivity extends AppCompatActivity {
 
