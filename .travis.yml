@@ -10,6 +10,7 @@ install:
     - echo y | android update sdk -u -a -t android-26
     - echo y | android update sdk -u -a -t extra-google-m2repository
     - echo y | android update sdk -u -a -t extra-android-m2repository
+    - echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
 
 cache:
     directories:
