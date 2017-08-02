@@ -16,6 +16,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:authorities="com.example.todule.provider"
+            android:name=".provider.ToduleProvider"
+            android:exported="false">
+        </provider>
     </application>
 
 </manifest>

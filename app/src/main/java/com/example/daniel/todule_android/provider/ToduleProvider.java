@@ -47,7 +47,7 @@ public class ToduleProvider extends ContentProvider{
             case ENTRY_LIST:
                 builder.setTables(TodoEntry.TABLE_NAME);
                 if (TextUtils.isEmpty(sortOrder)) {
-                    sortOrder = "_ID ASC";
+                    sortOrder = TodoEntry.SORT_ORDER_DEFAULT;
                 }
                 break;
             // Single row
