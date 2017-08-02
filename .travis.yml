@@ -1,0 +1,21 @@
+language: android
+jdk: oraclejdk8
+sudo: false
+android:
+  components:
+     - tools
+     - platform-tools
+
+    # The BuildTools version used by your project
+    - build-tools-26.0.1
+
+    # The SDK version used to compile your project
+    - android-26
+
+    # Additional components
+    - extra-google-m2repository
+    - extra-android-m2repository
+
+cache:
+    directories:
+        - $HOME/.gradle
