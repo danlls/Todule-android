@@ -37,6 +37,6 @@ public final class ToduleDBContract {
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/vnd.com.example.todule.todo_entry";
         public static final String[] PROJECTION_ALL = {_ID, COLUMN_NAME_TITLE, COLUMN_NAME_DESCRIPTION,
             COLUMN_NAME_CREATED_DATE, COLUMN_NAME_DUE_DATE };
-        public static final String SORT_ORDER_DEFAULT = _ID + " ASC";
+        public static final String SORT_ORDER_DEFAULT = COLUMN_NAME_DUE_DATE + " ASC";
     }
 }

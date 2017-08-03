@@ -10,6 +10,8 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 
+import com.example.daniel.todule_android.R;
+import com.example.daniel.todule_android.adapter.MainCursorAdapter;
 import com.example.daniel.todule_android.provider.ToduleDBContract;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
 
@@ -19,7 +21,7 @@ import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
 
 public class ToduleListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final int LOADER_ID = 1;
-    SimpleCursorAdapter mAdapter;
+    MainCursorAdapter mAdapter;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -27,9 +29,7 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
         ((MainActivity)getActivity()).fabVisibility(true);
 
         setEmptyText("No entry found");
-        mAdapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_list_item_2,
-                null, new String[] { TodoEntry.COLUMN_NAME_TITLE, TodoEntry.COLUMN_NAME_DESCRIPTION },
-                new int[] { android.R.id.text1, android.R.id.text2 }, 0);
+        mAdapter = new MainCursorAdapter(getActivity(), null, 0);
         setListAdapter(mAdapter);
         getLoaderManager().initLoader(LOADER_ID, null, this);
     }
