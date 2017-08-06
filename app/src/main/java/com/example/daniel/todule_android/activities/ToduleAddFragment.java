@@ -41,8 +41,11 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
 
         EditText dateEdit = (EditText) view.findViewById(R.id.edit_date);
         dateEdit.setOnClickListener(this);
+        DateFormat df = DateFormat.getDateInstance();
+        dateEdit.setText(df.format(myCalendar.getTime()));
         EditText timeEdit = (EditText) view.findViewById(R.id.edit_time);
         timeEdit.setOnClickListener(this);
+        timeEdit.setText(String.format("%02d", myCalendar.HOUR_OF_DAY) + ":" + String.format("%02d", myCalendar.MINUTE));
 
         return view;
     }
@@ -60,7 +63,7 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
                 break;
             case R.id.edit_date:
                 final EditText editDate = (EditText) view;
-                new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+                DatePickerDialog datePicker = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
                         myCalendar.set(Calendar.YEAR, i);
@@ -70,7 +73,9 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
                         editDate.setText(df.format(myCalendar.getTime()));
                     }
                 }, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+                        myCalendar.get(Calendar.DAY_OF_MONTH));
+                datePicker.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+                datePicker.show();
                 break;
             case R.id.edit_time:
                 final EditText editTime = (EditText) view;
