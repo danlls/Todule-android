@@ -39,7 +39,7 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
         Uri ENTRY_URI = ToduleDBContract.TodoEntry.CONTENT_URI;
 
         String select = "(" + TodoEntry.COLUMN_NAME_TITLE + " NOTNULL) AND ("
-                + TodoEntry.COLUMN_NAME_DESCRIPTION + " != '' )";
+                + TodoEntry.COLUMN_NAME_TASK_DONE + " == 0 )";
         CursorLoader cursorLoader = new CursorLoader(getActivity(), ENTRY_URI,
                 TodoEntry.PROJECTION_ALL, select, null, TodoEntry.SORT_ORDER_DEFAULT);
         return cursorLoader;
