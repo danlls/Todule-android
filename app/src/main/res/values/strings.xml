@@ -7,4 +7,6 @@
     <string name="text_date">Date:</string>
     <string name="text_time">Time:</string>
     <string name="mark_done">Mark as Done</string>
+    <string name="todule_list_page_title">All entries</string>
+    <string name="todule_history_page_title">History</string>
 </resources>

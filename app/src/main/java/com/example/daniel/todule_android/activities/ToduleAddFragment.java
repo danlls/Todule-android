@@ -6,14 +6,17 @@ import android.content.ContentValues;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
@@ -33,6 +36,8 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add, container, false);
         ((MainActivity)getActivity()).fabVisibility(false);
+        getActivity().findViewById(R.id.toolbar).setVisibility(View.GONE);
+        ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Button saveButton = (Button) view.findViewById(R.id.save_button);
         saveButton.setOnClickListener(this);
@@ -56,10 +61,10 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
             case R.id.save_button:
                 // TODO : Validate before save
                 addEntry();
-                getFragmentManager().popBackStack();
+                getActivity().onBackPressed();
                 break;
             case R.id.cancel_button:
-                getFragmentManager().popBackStack();
+                getActivity().onBackPressed();
                 break;
             case R.id.edit_date:
                 final EditText editDate = (EditText) view;
@@ -110,4 +115,12 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
         getContext().getContentResolver().insert(TodoEntry.CONTENT_URI, cv);
     }
 
+    @Override
+    public void onDestroyView() {
+        ((MainActivity)getActivity()).fabVisibility(true);
+        getActivity().findViewById(R.id.toolbar).setVisibility(View.VISIBLE);
+        ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+
+        super.onDestroyView();
+    }
 }
