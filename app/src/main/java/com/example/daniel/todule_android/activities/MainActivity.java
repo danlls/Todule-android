@@ -122,13 +122,17 @@ public class MainActivity extends AppCompatActivity{
             switch(position) {
                 case 0:
                     fragment = Fragment.instantiate(context, ToduleListFragment.class.getName());
+                    break;
+                case 1:
+                    fragment = Fragment.instantiate(context, ToduleHistoryFragment.class.getName());
+                    break;
             }
             return fragment;
         }
 
         @Override
         public int getCount() {
-            return 1;
+            return 2;
         }
 
         @Override
@@ -136,6 +140,8 @@ public class MainActivity extends AppCompatActivity{
             switch(position){
                 case 0:
                     return getString(R.string.todule_list_page_title);
+                case 1:
+                    return getString(R.string.todule_history_page_title);
                 default:
                     return null;
             }
