@@ -24,7 +24,6 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ((MainActivity)getActivity()).fabVisibility(true);
 
         setEmptyText("No entry found");
         mAdapter = new MainCursorAdapter(getActivity(), null, 0);

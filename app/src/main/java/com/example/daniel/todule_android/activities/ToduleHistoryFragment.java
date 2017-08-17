@@ -23,7 +23,6 @@ public class ToduleHistoryFragment extends ListFragment implements LoaderManager
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ((MainActivity)getActivity()).fabVisibility(false);
 
         setEmptyText("No entry found");
         mAdapter = new HistoryAdapter(getActivity(), null, 0);

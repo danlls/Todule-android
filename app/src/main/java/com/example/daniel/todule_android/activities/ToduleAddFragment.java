@@ -45,7 +45,7 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
         dateEdit.setText(df.format(myCalendar.getTime()));
         EditText timeEdit = (EditText) view.findViewById(R.id.edit_time);
         timeEdit.setOnClickListener(this);
-        timeEdit.setText(String.format("%02d", myCalendar.HOUR_OF_DAY) + ":" + String.format("%02d", myCalendar.MINUTE));
+        timeEdit.setText(String.format("%02d", Calendar.HOUR_OF_DAY) + ": " + String.format("%02d", Calendar.MINUTE));
 
         return view;
     }

@@ -57,7 +57,6 @@ public class MainActivity extends AppCompatActivity{
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(mViewPager);
 
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
