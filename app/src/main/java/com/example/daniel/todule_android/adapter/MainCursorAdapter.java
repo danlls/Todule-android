@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.widget.CursorAdapter;
-import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +14,6 @@ import android.widget.TextView;
 
 import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
-
-import java.text.Format;
 
 import static java.text.DateFormat.SHORT;
 

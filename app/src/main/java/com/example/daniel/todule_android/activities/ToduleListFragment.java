@@ -8,9 +8,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.SimpleCursorAdapter;
 
-import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.adapter.MainCursorAdapter;
 import com.example.daniel.todule_android.provider.ToduleDBContract;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
