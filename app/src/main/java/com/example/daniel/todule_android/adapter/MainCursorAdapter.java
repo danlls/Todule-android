@@ -37,7 +37,7 @@ public class MainCursorAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         final Cursor cursor1 = cursor;
         TextView titleView = (TextView) view.findViewById(R.id.title_text);
-        TextView descriptionView = (TextView) view.findViewById(R.id.description_text);
+        final TextView descriptionView = (TextView) view.findViewById(R.id.description_text);
         TextView dueDateView = (TextView) view.findViewById(R.id.due_text);
         Button done_button = (Button) view.findViewById(R.id.done_button);
 
@@ -48,6 +48,7 @@ public class MainCursorAdapter extends CursorAdapter {
 
         titleView.setText(title);
         descriptionView.setText(description);
+        descriptionView.setVisibility(View.GONE);
         dueDateView.setText(dueDateString);
         done_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,10 +60,23 @@ public class MainCursorAdapter extends CursorAdapter {
                 view.getContext().getContentResolver().update(aUri , cv, null, null);
             }
         });
+
+        view.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                if (descriptionView.getVisibility() == View.GONE){
+                    descriptionView.setVisibility(View.VISIBLE);
+                } else {
+                    descriptionView.setVisibility(View.GONE);
+                }
+            }
+        });
+
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         return cursorInflater.inflate(R.layout.fragment_list_item, parent, false);
     }
+
 }

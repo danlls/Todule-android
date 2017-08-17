@@ -26,13 +26,25 @@ public class HistoryAdapter extends CursorAdapter{
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         TextView titleView = (TextView) view.findViewById(R.id.title_text);
-        TextView descriptionView = (TextView) view.findViewById(R.id.description_text);
+        final TextView descriptionView = (TextView) view.findViewById(R.id.description_text);
 
         String title = cursor.getString(cursor.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_TITLE));
         String description = cursor.getString(cursor.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_DESCRIPTION));
 
         titleView.setText(title);
         descriptionView.setText(description);
+        descriptionView.setVisibility(View.GONE);
+
+        view.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                if (descriptionView.getVisibility() == View.GONE){
+                    descriptionView.setVisibility(View.VISIBLE);
+                } else {
+                    descriptionView.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     @Override
