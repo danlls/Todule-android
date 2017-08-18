@@ -1,5 +1,6 @@
 package com.example.daniel.todule_android.adapter;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -32,7 +33,8 @@ public class MainCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        final Cursor cursor1 = cursor;
+        final long id = cursor.getLong(cursor.getColumnIndexOrThrow(TodoEntry._ID));
+
         TextView titleView = (TextView) view.findViewById(R.id.title_text);
         final TextView descriptionView = (TextView) view.findViewById(R.id.description_text);
         TextView dueDateView = (TextView) view.findViewById(R.id.due_text);
@@ -52,9 +54,8 @@ public class MainCursorAdapter extends CursorAdapter {
             public void onClick(View view) {
                 ContentValues cv = new ContentValues();
                 cv.put(TodoEntry.COLUMN_NAME_TASK_DONE, 1);
-                String id = cursor1.getString(cursor1.getColumnIndexOrThrow(TodoEntry._ID));
-                Uri aUri = Uri.withAppendedPath(TodoEntry.CONTENT_ID_URI_BASE, id);
-                view.getContext().getContentResolver().update(aUri , cv, null, null);
+                Uri aUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
+                view.getContext().getContentResolver().update(aUri, cv, null, null);
             }
         });
 
