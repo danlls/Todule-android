@@ -84,14 +84,19 @@ public class MainActivity extends AppCompatActivity{
         } else {
             getSupportFragmentManager().popBackStack();
         }
-        hideSoftKeyboard();
+        hideSoftKeyboard(true);
     }
 
-    public void hideSoftKeyboard ()
+    public void hideSoftKeyboard (boolean hide)
     {
         if (this.getCurrentFocus() == null) return;
         InputMethodManager imm = (InputMethodManager)this.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(this.getCurrentFocus().getApplicationWindowToken(), 0);
+        if(hide){
+            imm.hideSoftInputFromWindow(this.getCurrentFocus().getApplicationWindowToken(), 0);
+        } else {
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        }
+
     }
 
     @Override
