@@ -7,7 +7,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +51,7 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
             @Override
             public void onFocusChange(final View view, boolean b) {
                 if (b) {
-                    ((MainActivity) getActivity()).hideSoftKeyboard();
+                    ((MainActivity) getActivity()).hideSoftKeyboard(true);
                     DatePickerDialog datePicker = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
@@ -77,7 +79,7 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
             @Override
             public void onFocusChange(final View view, boolean b) {
                 if (b) {
-                    ((MainActivity) getActivity()).hideSoftKeyboard();
+                    ((MainActivity) getActivity()).hideSoftKeyboard(true);
                     TimePickerDialog timePicker = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
                         @Override
                         public void onTimeSet(TimePicker timePicker, int i, int i1) {
@@ -99,7 +101,31 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
             }
         });
 
+        timeEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                long date_time = myCalendar.getTimeInMillis();
+                long current_date_time = System.currentTimeMillis();
+                if (date_time < current_date_time){
+                    timeEdit.setError("Please select a time later than now");
+                } else {
+                    timeEdit.setError(null);
+                }
+            }
+        });
+
+
         // Set default
+        myCalendar.set(Calendar.HOUR_OF_DAY, 23);
+        myCalendar.set(Calendar.MINUTE, 59);
         myCalendar.set(Calendar.SECOND, 0);
         DateFormat df = DateFormat.getDateInstance();
         dateEdit.setText(df.format(myCalendar.getTime()));
@@ -113,9 +139,10 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
     public void onClick(View view) {
         switch(view.getId()){
             case R.id.save_button:
-                // TODO : Validate before save
-                addEntry();
-                getActivity().onBackPressed();
+                if (validateInputs()){
+                    addEntry();
+                    getActivity().onBackPressed();
+                }
                 break;
             case R.id.cancel_button:
                 getActivity().onBackPressed();
@@ -148,5 +175,28 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
         ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         super.onDestroyView();
+    }
+
+    private boolean validateInputs() {
+        boolean valid;
+        // Validates title (required field, ensure title is given.)
+        EditText title = (EditText) getView().findViewById(R.id.edit_title);
+        if (!title.getText().toString().isEmpty()) {
+            valid = true;
+        } else {
+            title.setError("This field is required.");
+            title.requestFocus();
+            ((MainActivity) getActivity()).hideSoftKeyboard(false);
+            valid = false;
+        }
+
+        // Validates due_date (must be later than now.)
+        EditText time = (EditText) getView().findViewById(R.id.edit_time);
+        if (time.getError() != null){
+            time.requestFocus();
+            valid = false;
+        }
+
+        return valid;
     }
 }
