@@ -43,5 +43,5 @@
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
         android:clickable="true"
-        android:src="@drawable/fab_pink" />
+        android:src="@drawable/fab_add" />
 </android.support.design.widget.CoordinatorLayout>
