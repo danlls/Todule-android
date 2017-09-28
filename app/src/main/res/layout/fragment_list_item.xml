@@ -18,7 +18,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/title_text"
-        android:paddingBottom="10dp"/>
+        android:paddingBottom="10dp"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
 
     <TextView
         android:layout_width="wrap_content"
@@ -37,6 +40,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/done_button"
         android:layout_below="@+id/description_text"
+        android:drawableLeft="@drawable/ic_done_black_18dp"
+        android:drawableTint="@color/darkGreen"
         android:text="@string/mark_done"/>
 
 </RelativeLayout>

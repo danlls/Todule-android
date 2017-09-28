@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.widget.CursorAdapter;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,7 +48,6 @@ public class MainCursorAdapter extends CursorAdapter {
 
         titleView.setText(title);
         descriptionView.setText(description);
-        descriptionView.setVisibility(View.GONE);
         dueDateView.setText(dueDateString);
         done_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,10 +62,12 @@ public class MainCursorAdapter extends CursorAdapter {
         view.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                if (descriptionView.getVisibility() == View.GONE){
-                    descriptionView.setVisibility(View.VISIBLE);
+                if(descriptionView.getMaxLines() == 1) {
+                    descriptionView.setMaxLines(Integer.MAX_VALUE);
+                    descriptionView.setEllipsize(null);
                 } else {
-                    descriptionView.setVisibility(View.GONE);
+                    descriptionView.setMaxLines(1);
+                    descriptionView.setEllipsize(TextUtils.TruncateAt.END);
                 }
             }
         });
