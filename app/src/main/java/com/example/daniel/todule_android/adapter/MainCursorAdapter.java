@@ -16,8 +16,7 @@ import android.widget.TextView;
 
 import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
-
-import static java.text.DateFormat.SHORT;
+import com.example.daniel.todule_android.utilities.DateTimeUtils;
 
 
 /**
@@ -39,16 +38,20 @@ public class MainCursorAdapter extends CursorAdapter {
         TextView titleView = (TextView) view.findViewById(R.id.title_text);
         final TextView descriptionView = (TextView) view.findViewById(R.id.description_text);
         TextView dueDateView = (TextView) view.findViewById(R.id.due_text);
+        TextView countdownView = (TextView) view.findViewById(R.id.countdown_text);
         Button done_button = (Button) view.findViewById(R.id.done_button);
 
         String title = cursor.getString(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_TITLE));
         String description = cursor.getString(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_DESCRIPTION));
         long dueDate = cursor.getLong(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_DUE_DATE));
-        String dueDateString = DateUtils.formatSameDayTime(dueDate, System.currentTimeMillis(), SHORT, SHORT).toString();
+        String dueDateString = DateUtils.formatDateTime(context, dueDate, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_TIME);
+        String countdownString =  DateTimeUtils.dateTimeDiff(dueDate);
 
         titleView.setText(title);
         descriptionView.setText(description);
         dueDateView.setText(dueDateString);
+        countdownView.setText(countdownString);
+
         done_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
