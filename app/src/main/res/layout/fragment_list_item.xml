@@ -2,14 +2,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
      android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:clipToPadding="false">
 
     <TextView android:id="@+id/title_text"
         android:textSize="20sp"
-        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/countdown_text"
+        android:textColor="@color/black"
         android:layout_alignParentLeft="true" />
 
     <TextView android:id="@+id/description_text"
@@ -50,7 +51,10 @@
         android:id="@+id/done_button"
         android:layout_below="@+id/description_text"
         android:drawableLeft="@drawable/ic_done_black_18dp"
-        android:drawableTint="@color/darkGreen"
-        android:text="@string/mark_done"/>
+        android:drawableTint="@color/white"
+        android:textColor="@color/white"
+        android:background="@drawable/done_raised_bg"
+        android:text="@string/mark_done"
+        android:elevation="2dp" />
 
 </RelativeLayout>

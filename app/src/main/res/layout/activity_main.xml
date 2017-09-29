@@ -16,7 +16,9 @@
         <android.support.design.widget.TabLayout
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:tabSelectedTextColor="@color/white"
+            app:tabTextColor="@color/grey">
 
         </android.support.design.widget.TabLayout>
 
@@ -43,5 +45,6 @@
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
         android:clickable="true"
-        android:src="@drawable/fab_add" />
+        android:src="@drawable/fab_add"
+        android:elevation="12dp" />
 </android.support.design.widget.CoordinatorLayout>
