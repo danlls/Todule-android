@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -55,10 +56,20 @@ public class MainCursorAdapter extends CursorAdapter {
         done_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ContentValues cv = new ContentValues();
+                final ContentValues cv = new ContentValues();
                 cv.put(TodoEntry.COLUMN_NAME_TASK_DONE, 1);
                 Uri aUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
                 view.getContext().getContentResolver().update(aUri, cv, null, null);
+                Snackbar mySnackbar = Snackbar.make(view, R.string.entry_done, Snackbar.LENGTH_LONG);
+                mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        cv.put(TodoEntry.COLUMN_NAME_TASK_DONE, 0);
+                        Uri aUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
+                        view.getContext().getContentResolver().update(aUri, cv, null, null);
+                    }
+                });
+                mySnackbar.show();
             }
         });
 
