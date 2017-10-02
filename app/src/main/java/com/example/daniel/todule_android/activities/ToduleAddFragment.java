@@ -30,18 +30,21 @@ import java.util.Calendar;
 
 public class ToduleAddFragment extends Fragment implements View.OnClickListener{
     Calendar myCalendar = Calendar.getInstance();
+    MainActivity myActivity;
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        myActivity = (MainActivity) getActivity();
         View view = inflater.inflate(R.layout.fragment_add, container, false);
-        ((MainActivity)getActivity()).fabVisibility(false);
+        myActivity.fabVisibility(false);
         getActivity().findViewById(R.id.toolbar).setVisibility(View.GONE);
-        ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        myActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Button saveButton = (Button) view.findViewById(R.id.save_button);
         saveButton.setOnClickListener(this);
         Button cancelButton = (Button) view.findViewById(R.id.cancel_button);
         cancelButton.setOnClickListener(this);
 
+        EditText titleEdit = view.findViewById(R.id.edit_title);
         final EditText dateEdit = view.findViewById(R.id.edit_date);
         final EditText timeEdit = view.findViewById(R.id.edit_time);
         dateEdit.setInputType(InputType.TYPE_NULL);
@@ -51,7 +54,7 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
             @Override
             public void onFocusChange(final View view, boolean b) {
                 if (b) {
-                    ((MainActivity) getActivity()).hideSoftKeyboard(true);
+                    myActivity.hideSoftKeyboard(true);
                     DatePickerDialog datePicker = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
@@ -79,7 +82,7 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
             @Override
             public void onFocusChange(final View view, boolean b) {
                 if (b) {
-                    ((MainActivity) getActivity()).hideSoftKeyboard(true);
+                    myActivity.hideSoftKeyboard(true);
                     TimePickerDialog timePicker = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
                         @Override
                         public void onTimeSet(TimePicker timePicker, int i, int i1) {
@@ -122,7 +125,6 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
             }
         });
 
-
         // Set default
         myCalendar.set(Calendar.HOUR_OF_DAY, 23);
         myCalendar.set(Calendar.MINUTE, 59);
@@ -131,6 +133,9 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
         dateEdit.setText(df.format(myCalendar.getTime()));
         DateFormat df2 = DateFormat.getTimeInstance();
         timeEdit.setText(df2.format(myCalendar.getTime()));
+
+        titleEdit.requestFocus();
+        myActivity.hideSoftKeyboard(false);
 
         return view;
     }
@@ -170,9 +175,9 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onDestroyView() {
-        ((MainActivity)getActivity()).fabVisibility(true);
+        myActivity.fabVisibility(true);
         getActivity().findViewById(R.id.toolbar).setVisibility(View.VISIBLE);
-        ((MainActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        myActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         super.onDestroyView();
     }
@@ -186,7 +191,7 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
         } else {
             title.setError("This field is required.");
             title.requestFocus();
-            ((MainActivity) getActivity()).hideSoftKeyboard(false);
+            myActivity.hideSoftKeyboard(false);
             valid = false;
         }
 
