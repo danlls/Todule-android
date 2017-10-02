@@ -11,12 +11,16 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
@@ -28,7 +32,7 @@ import java.util.Calendar;
  * Created by danieL on 8/1/2017.
  */
 
-public class ToduleAddFragment extends Fragment implements View.OnClickListener{
+public class ToduleAddFragment extends Fragment{
     Calendar myCalendar = Calendar.getInstance();
     MainActivity myActivity;
 
@@ -38,11 +42,7 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
         myActivity.fabVisibility(false);
         getActivity().findViewById(R.id.toolbar).setVisibility(View.GONE);
         myActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        Button saveButton = (Button) view.findViewById(R.id.save_button);
-        saveButton.setOnClickListener(this);
-        Button cancelButton = (Button) view.findViewById(R.id.cancel_button);
-        cancelButton.setOnClickListener(this);
+        setHasOptionsMenu(true);
 
         EditText titleEdit = view.findViewById(R.id.edit_title);
         final EditText dateEdit = view.findViewById(R.id.edit_date);
@@ -141,18 +141,25 @@ public class ToduleAddFragment extends Fragment implements View.OnClickListener{
     }
 
     @Override
-    public void onClick(View view) {
-        switch(view.getId()){
-            case R.id.save_button:
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_fragment_add, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.action_save:
                 if (validateInputs()){
                     addEntry();
+                    Toast.makeText(myActivity, R.string.entry_created, Toast.LENGTH_SHORT).show();
                     getActivity().onBackPressed();
                 }
                 break;
-            case R.id.cancel_button:
-                getActivity().onBackPressed();
-                break;
+            default:
+                return super.onOptionsItemSelected(item);
         }
+        return true;
     }
 
     private void addEntry(){

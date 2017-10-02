@@ -56,4 +56,6 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
         // longer using it.
         mAdapter.swapCursor(null);
     }
+
+
 }
