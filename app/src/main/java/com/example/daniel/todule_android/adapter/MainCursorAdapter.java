@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -55,6 +56,11 @@ public class MainCursorAdapter extends CursorAdapter {
             descriptionView.setText(R.string.no_descrption);
         }
         dueDateView.setText(dueDateString);
+        if(dueDate < System.currentTimeMillis()) {
+            countdownView.setTextColor(ContextCompat.getColor(context, R.color.red));
+        } else {
+            countdownView.setTextColor(ContextCompat.getColor(context, R.color.normalGreen));
+        }
         countdownView.setText(countdownString);
 
         done_button.setOnClickListener(new View.OnClickListener() {

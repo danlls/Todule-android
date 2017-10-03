@@ -32,9 +32,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginLeft="16dp"
         android:drawableLeft="@drawable/ic_alarm_black_18dp"
-        android:drawablePadding="5dp"
-        android:drawableTint="@color/red"
-        android:textColor="@color/red"/>
+        android:drawablePadding="5dp" />
 
     <TextView
         android:layout_width="wrap_content"
