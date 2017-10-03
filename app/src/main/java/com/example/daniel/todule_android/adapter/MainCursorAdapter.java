@@ -49,7 +49,11 @@ public class MainCursorAdapter extends CursorAdapter {
         String countdownString =  DateTimeUtils.dateTimeDiff(dueDate);
 
         titleView.setText(title);
-        descriptionView.setText(description);
+        if(!description.isEmpty()){
+            descriptionView.setText(description);
+        } else {
+            descriptionView.setText(R.string.no_descrption);
+        }
         dueDateView.setText(dueDateString);
         countdownView.setText(countdownString);
 
