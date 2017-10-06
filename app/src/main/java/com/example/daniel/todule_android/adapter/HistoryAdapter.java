@@ -3,6 +3,7 @@ package com.example.daniel.todule_android.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,17 +39,23 @@ public class HistoryAdapter extends CursorAdapter{
         String completed_string = DateUtils.formatDateTime(context, completed_date, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_TIME);
 
         titleView.setText(title);
-        descriptionView.setText(description);
-        descriptionView.setVisibility(View.GONE);
+        if(!description.isEmpty()){
+            description = description.trim();
+            descriptionView.setText(description);
+        } else {
+            descriptionView.setText(R.string.no_descrption);
+        }
         completedView.setText(completed_string);
 
         view.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                if (descriptionView.getVisibility() == View.GONE){
-                    descriptionView.setVisibility(View.VISIBLE);
+                if(descriptionView.getMaxLines() == 1) {
+                    descriptionView.setMaxLines(Integer.MAX_VALUE);
+                    descriptionView.setEllipsize(null);
                 } else {
-                    descriptionView.setVisibility(View.GONE);
+                    descriptionView.setMaxLines(1);
+                    descriptionView.setEllipsize(TextUtils.TruncateAt.END);
                 }
             }
         });

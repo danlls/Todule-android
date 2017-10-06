@@ -51,6 +51,7 @@ public class MainCursorAdapter extends CursorAdapter {
 
         titleView.setText(title);
         if(!description.isEmpty()){
+            description = description.trim();
             descriptionView.setText(description);
         } else {
             descriptionView.setText(R.string.no_descrption);

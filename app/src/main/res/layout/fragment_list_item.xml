@@ -22,7 +22,7 @@
         android:maxLines="1"
         android:ellipsize="end"
         android:layout_alignParentLeft="true"
-        android:paddingTop="5dp"/>
+        android:paddingTop="5dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -37,17 +37,17 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/title_text"
         android:id="@+id/due_text"
         android:drawableLeft="@drawable/ic_date_range_black_18dp"
         android:drawablePadding="3dp"
-        android:paddingTop="3dp"
-        android:layout_below="@+id/title_text"/>
+        android:paddingTop="3dp" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/done_button"
-        android:layout_below="@+id/description_text"
+        android:layout_below="@id/description_text"
         android:drawableLeft="@drawable/ic_done_black_18dp"
         android:drawableTint="@color/white"
         android:textColor="@color/white"
