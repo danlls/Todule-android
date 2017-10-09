@@ -6,7 +6,8 @@
     android:paddingRight="15sp"
     android:paddingTop="15sp"
     android:paddingBottom="15sp"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:focusableInTouchMode="true">
 
 
     <android.support.design.widget.TextInputLayout
