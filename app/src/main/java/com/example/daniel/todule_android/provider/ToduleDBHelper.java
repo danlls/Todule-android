@@ -18,8 +18,8 @@ public class ToduleDBHelper extends SQLiteOpenHelper{
                     TodoEntry.COLUMN_NAME_CREATED_DATE + " INTEGER," +
                     TodoEntry.COLUMN_NAME_DUE_DATE + " INTEGER," +
                     TodoEntry.COLUMN_NAME_TASK_DONE + " INTEGER DEFAULT 0," +
-                    TodoEntry.COLUMN_NAME_COMPLETED_DATE + "INTEGER" +
-                    ")";
+                    TodoEntry.COLUMN_NAME_COMPLETED_DATE + " INTEGER DEFAULT NULL" +
+                    ");";
 
 
     private static final String SQL_DELETE_ENTRIES =
@@ -40,6 +40,9 @@ public class ToduleDBHelper extends SQLiteOpenHelper{
         // to simply to discard the data and start over
         if (oldVersion < 6) {
             db.execSQL("ALTER TABLE " + TodoEntry.TABLE_NAME + " ADD COLUMN " + TodoEntry.COLUMN_NAME_COMPLETED_DATE + " INTEGER");
+        } else {
+            db.execSQL(SQL_DELETE_ENTRIES);
+            db.execSQL(SQL_CREATE_ENTRIES);
         }
     }
 
