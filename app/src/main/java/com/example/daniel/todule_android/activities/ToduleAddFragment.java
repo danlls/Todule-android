@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
@@ -134,7 +135,12 @@ public class ToduleAddFragment extends Fragment{
         timeEdit.setText(df2.format(myCalendar.getTime()));
 
         titleEdit.requestFocus();
-        myActivity.hideSoftKeyboard(false);
+        titleEdit.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                myActivity.hideSoftKeyboard(false);
+            }
+        }, 200);
 
         return view;
     }
