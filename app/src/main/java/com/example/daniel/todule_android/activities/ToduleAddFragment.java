@@ -16,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
@@ -131,7 +130,7 @@ public class ToduleAddFragment extends Fragment{
         myCalendar.set(Calendar.SECOND, 0);
         DateFormat df = DateFormat.getDateInstance();
         dateEdit.setText(df.format(myCalendar.getTime()));
-        DateFormat df2 = DateFormat.getTimeInstance();
+        DateFormat df2 = DateFormat.getTimeInstance(DateFormat.SHORT);
         timeEdit.setText(df2.format(myCalendar.getTime()));
 
         titleEdit.requestFocus();
