@@ -92,7 +92,7 @@ public class ToduleAddFragment extends Fragment{
                         public void onTimeSet(TimePicker timePicker, int i, int i1) {
                             myCalendar.set(Calendar.HOUR_OF_DAY, i);
                             myCalendar.set(Calendar.MINUTE, i1);
-                            DateFormat dft = DateFormat.getTimeInstance();
+                            DateFormat dft = DateFormat.getTimeInstance(DateFormat.SHORT);
                             EditText ed = (EditText) view;
                             ed.setText(dft.format(myCalendar.getTime()));
                         }
