@@ -1,6 +1,11 @@
 package com.example.daniel.todule_android.activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -15,6 +20,9 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.example.daniel.todule_android.R;
+import com.example.daniel.todule_android.provider.ToduleDBContract;
+import com.example.daniel.todule_android.utilities.DateTimeUtils;
+
 
 public class MainActivity extends AppCompatActivity{
 
@@ -145,6 +153,25 @@ public class MainActivity extends AppCompatActivity{
                     return null;
             }
         }
+    }
+
+    public void setReminder(Uri itemUri, long datetimeInMillis){
+
+        Cursor cr = getContentResolver().query(itemUri, ToduleDBContract.TodoEntry.PROJECTION_ALL, null, null, ToduleDBContract.TodoEntry.SORT_ORDER_DEFAULT);
+        cr.moveToFirst();
+        long itemId = Long.valueOf(itemUri.getLastPathSegment());
+        String title = cr.getString(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_TITLE));
+        long dueDate = cr.getLong(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_DUE_DATE));
+        String dueDateString = DateTimeUtils.dateTimeDiff(dueDate);
+
+        Intent intent = new Intent(context, NotificationReceiver.class);
+        intent.setData(Uri.parse(R.string.reminder_intent_scheme + String.valueOf(itemId)));
+        intent.putExtra("todule_title", title);
+        intent.putExtra("todule_due_date", dueDateString);
+        PendingIntent sender = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        am.set(AlarmManager.RTC_WAKEUP, datetimeInMillis, sender);
     }
 }
 

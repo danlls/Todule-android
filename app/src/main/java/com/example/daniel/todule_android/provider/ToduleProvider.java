@@ -53,8 +53,8 @@ public class ToduleProvider extends ContentProvider{
             // Single row
             case ENTRY_ID:
                 builder.setTables(TodoEntry.TABLE_NAME);
-                selection = selection + "_ID = " + uri.getLastPathSegment();
-                builder.appendWhere(selection);
+
+                builder.appendWhere("_ID = " + uri.getLastPathSegment());
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);

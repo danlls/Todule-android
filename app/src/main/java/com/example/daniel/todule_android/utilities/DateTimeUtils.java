@@ -28,13 +28,17 @@ public final class DateTimeUtils {
         long diffInHours = diffInMinutes / 60;
         long diffInDays = diffInHours / 24;
         if (diffInDays >= 1) {
-            result = diffInDays + " days";
+            result = String.valueOf(diffInDays);
+            result += (diffInDays == 1) ? " day" : " days";
         } else if (diffInHours >= 1) {
-            result = diffInHours + " hours";
+            result = String.valueOf(diffInHours);
+            result += (diffInHours == 1) ? " hour" : " hours";
         } else if (diffInMinutes >= 1) {
-            result = diffInMinutes + " minutes";
+            result = String.valueOf(diffInMinutes);
+            result += (diffInMinutes == 1) ? " minute" : " minutes";
         } else {
-            result = diffInSeconds + " seconds";
+            result = String.valueOf(diffInSeconds);
+            result += (diffInSeconds == 1) ? " second" : " seconds";
         }
         return result + pastOrFuture;
 
