@@ -21,6 +21,12 @@
             android:name=".provider.ToduleProvider"
             android:exported="false">
         </provider>
+        <receiver android:name=".activities.NotificationReceiver">
+            <intent-filter>
+                <action android:name="com.example.daniel.todule_android.VIEW_ENTRY"/>
+                <data android:scheme="@string/reminder_intent_scheme"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

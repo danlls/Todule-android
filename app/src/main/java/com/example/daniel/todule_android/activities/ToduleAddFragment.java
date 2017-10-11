@@ -1,9 +1,13 @@
 package com.example.daniel.todule_android.activities;
 
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -182,7 +186,9 @@ public class ToduleAddFragment extends Fragment{
         cv.put(TodoEntry.COLUMN_NAME_DESCRIPTION, description_text);
         cv.put(TodoEntry.COLUMN_NAME_DUE_DATE, due_date);
         cv.put(TodoEntry.COLUMN_NAME_CREATED_DATE, created_date);
-        getContext().getContentResolver().insert(TodoEntry.CONTENT_URI, cv);
+        Uri itemUri = getContext().getContentResolver().insert(TodoEntry.CONTENT_URI, cv);
+        // Reminder set at one minute before due_date
+        myActivity.setReminder(itemUri, due_date - 60 * 60 * 1000);
     }
 
     @Override
