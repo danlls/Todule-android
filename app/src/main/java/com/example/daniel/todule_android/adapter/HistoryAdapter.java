@@ -29,33 +29,31 @@ public class HistoryAdapter extends CursorAdapter{
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        TextView titleView = (TextView) view.findViewById(R.id.title_text);
-        final TextView descriptionView = (TextView) view.findViewById(R.id.description_text);
-        TextView completedView = view.findViewById(R.id.completed_date_text);
+        final ViewHolder holder = (ViewHolder) view.getTag();
 
         String title = cursor.getString(cursor.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_TITLE));
         String description = cursor.getString(cursor.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_DESCRIPTION));
         long completed_date = cursor.getLong(cursor.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_COMPLETED_DATE));
         String completed_string = DateUtils.formatDateTime(context, completed_date, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_TIME);
 
-        titleView.setText(title);
+        holder.title.setText(title);
         if(!description.isEmpty()){
             description = description.trim();
-            descriptionView.setText(description);
+            holder.description.setText(description);
         } else {
-            descriptionView.setText(R.string.no_descrption);
+            holder.description.setText(R.string.no_descrption);
         }
-        completedView.setText(completed_string);
+        holder.completed.setText(completed_string);
 
         view.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                if(descriptionView.getMaxLines() == 1) {
-                    descriptionView.setMaxLines(Integer.MAX_VALUE);
-                    descriptionView.setEllipsize(null);
+                if(holder.description.getMaxLines() == 1) {
+                    holder.description.setMaxLines(Integer.MAX_VALUE);
+                    holder.description.setEllipsize(null);
                 } else {
-                    descriptionView.setMaxLines(1);
-                    descriptionView.setEllipsize(TextUtils.TruncateAt.END);
+                    holder.description.setMaxLines(1);
+                    holder.description.setEllipsize(TextUtils.TruncateAt.END);
                 }
             }
         });
@@ -63,6 +61,18 @@ public class HistoryAdapter extends CursorAdapter{
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return cursorInflater.inflate(R.layout.fragment_history_item, parent, false);
+        View rowView = cursorInflater.inflate(R.layout.fragment_history_item, parent, false);
+        ViewHolder holder = new ViewHolder();
+        holder.title = rowView.findViewById(R.id.title_text);
+        holder.description = rowView.findViewById(R.id.description_text);
+        holder.completed = rowView.findViewById(R.id.completed_date_text);
+        rowView.setTag(holder);
+        return rowView;
+    }
+
+    static class ViewHolder {
+        TextView title;
+        TextView description;
+        TextView completed;
     }
 }

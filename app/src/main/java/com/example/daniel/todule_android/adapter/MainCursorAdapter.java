@@ -36,12 +36,7 @@ public class MainCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         final long id = cursor.getLong(cursor.getColumnIndexOrThrow(TodoEntry._ID));
-
-        TextView titleView = (TextView) view.findViewById(R.id.title_text);
-        final TextView descriptionView = (TextView) view.findViewById(R.id.description_text);
-        TextView dueDateView = (TextView) view.findViewById(R.id.due_text);
-        TextView countdownView = (TextView) view.findViewById(R.id.countdown_text);
-        Button done_button = (Button) view.findViewById(R.id.done_button);
+        final ViewHolder holder = (ViewHolder) view.getTag();
 
         String title = cursor.getString(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_TITLE));
         String description = cursor.getString(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_DESCRIPTION));
@@ -49,22 +44,22 @@ public class MainCursorAdapter extends CursorAdapter {
         String dueDateString = DateUtils.formatDateTime(context, dueDate, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_TIME);
         String countdownString =  DateTimeUtils.dateTimeDiff(dueDate);
 
-        titleView.setText(title);
+        holder.title.setText(title);
         if(!description.isEmpty()){
             description = description.trim();
-            descriptionView.setText(description);
+            holder.description.setText(description);
         } else {
-            descriptionView.setText(R.string.no_descrption);
+            holder.description.setText(R.string.no_descrption);
         }
-        dueDateView.setText(dueDateString);
+        holder.dueDate.setText(dueDateString);
         if(dueDate < System.currentTimeMillis()) {
-            countdownView.setTextColor(ContextCompat.getColor(context, R.color.red));
+            holder.countdown.setTextColor(ContextCompat.getColor(context, R.color.red));
         } else {
-            countdownView.setTextColor(ContextCompat.getColor(context, R.color.normalGreen));
+            holder.countdown.setTextColor(ContextCompat.getColor(context, R.color.normalGreen));
         }
-        countdownView.setText(countdownString);
+        holder.countdown.setText(countdownString);
 
-        done_button.setOnClickListener(new View.OnClickListener() {
+        holder.doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final ContentValues cv = new ContentValues();
@@ -88,12 +83,12 @@ public class MainCursorAdapter extends CursorAdapter {
         view.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                if(descriptionView.getMaxLines() == 1) {
-                    descriptionView.setMaxLines(Integer.MAX_VALUE);
-                    descriptionView.setEllipsize(null);
+                if(holder.description.getMaxLines() == 1) {
+                    holder.description.setMaxLines(Integer.MAX_VALUE);
+                    holder.description.setEllipsize(null);
                 } else {
-                    descriptionView.setMaxLines(1);
-                    descriptionView.setEllipsize(TextUtils.TruncateAt.END);
+                    holder.description.setMaxLines(1);
+                    holder.description.setEllipsize(TextUtils.TruncateAt.END);
                 }
             }
         });
@@ -102,7 +97,23 @@ public class MainCursorAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return cursorInflater.inflate(R.layout.fragment_list_item, parent, false);
+        View rowView = cursorInflater.inflate(R.layout.fragment_list_item, parent, false);
+        ViewHolder holder = new ViewHolder();
+        holder.title = rowView.findViewById(R.id.title_text);
+        holder.description = rowView.findViewById(R.id.description_text);
+        holder.dueDate = rowView.findViewById(R.id.due_text);
+        holder.countdown = rowView.findViewById(R.id.countdown_text);
+        holder.doneButton =  rowView.findViewById(R.id.done_button);
+        rowView.setTag(holder);
+        return rowView;
+    }
+
+    static class ViewHolder {
+        TextView title;
+        TextView description;
+        TextView dueDate;
+        TextView countdown;
+        Button doneButton;
     }
 
 }
