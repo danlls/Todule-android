@@ -13,6 +13,8 @@ public final class ToduleDBContract {
     public static final String AUTHORITY = "com.example.todule.provider";
     public static final String SCHEME = "content://";
     public static final String SLASH = "/";
+
+
     // To prevent someone from accidentally instantiating the contract class,
     // make the constructor private.
     private ToduleDBContract() {}
@@ -40,5 +42,9 @@ public final class ToduleDBContract {
         public static final String[] PROJECTION_ALL = {_ID, COLUMN_NAME_TITLE, COLUMN_NAME_DESCRIPTION,
             COLUMN_NAME_CREATED_DATE, COLUMN_NAME_DUE_DATE, COLUMN_NAME_TASK_DONE, COLUMN_NAME_COMPLETED_DATE };
         public static final String SORT_ORDER_DEFAULT = COLUMN_NAME_DUE_DATE + " ASC";
+
+        public static final int TASK_NOT_COMPLETED = 0;
+        public static final int TASK_COMPLETED = 1;
+        public static final int TASK_EXPIRED = 2;
     }
 }

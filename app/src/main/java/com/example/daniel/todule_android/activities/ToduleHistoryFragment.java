@@ -35,7 +35,7 @@ public class ToduleHistoryFragment extends ListFragment implements LoaderManager
         Uri ENTRY_URI = TodoEntry.CONTENT_URI;
 
         String select = "(" + TodoEntry.COLUMN_NAME_TITLE + " NOTNULL) AND ("
-                + TodoEntry.COLUMN_NAME_TASK_DONE + " == 1 )";
+                + TodoEntry.COLUMN_NAME_TASK_DONE + " != " + TodoEntry.TASK_NOT_COMPLETED + " )";
         CursorLoader cursorLoader = new CursorLoader(getActivity(), ENTRY_URI,
                 TodoEntry.PROJECTION_ALL, select, null, TodoEntry.SORT_ORDER_DEFAULT);
         return cursorLoader;

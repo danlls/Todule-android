@@ -1,10 +1,12 @@
 package com.example.daniel.todule_android.activities;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -28,6 +30,7 @@ import android.widget.Toast;
 
 import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
+import com.example.daniel.todule_android.services.ExpiryUpdateService;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -189,6 +192,7 @@ public class ToduleAddFragment extends Fragment{
         Uri itemUri = getContext().getContentResolver().insert(TodoEntry.CONTENT_URI, cv);
         // Reminder set at one minute before due_date
         myActivity.setReminder(itemUri, due_date - 60 * 60 * 1000);
+        setExpiry(itemUri, due_date);
     }
 
     @Override
@@ -221,5 +225,14 @@ public class ToduleAddFragment extends Fragment{
         }
 
         return valid;
+    }
+
+    private void setExpiry(Uri itemUri, long datetimeInMillis) {
+        Intent intent = new Intent(getContext(), ExpiryUpdateService.class);
+        intent.setData(itemUri);
+
+        PendingIntent sender = PendingIntent.getService(getContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager am = (AlarmManager) myActivity.getSystemService(Context.ALARM_SERVICE);
+        am.set(AlarmManager.RTC, datetimeInMillis, sender);
     }
 }

@@ -13,4 +13,5 @@
     <string name="undo_string">Undo</string>
     <string name="no_descrption">- No description -</string>
     <string name="reminder_intent_scheme">todule-reminder:</string>
+    <string name="expired">Expired</string>
 </resources>
