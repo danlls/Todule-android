@@ -27,6 +27,7 @@
                 <data android:scheme="@string/reminder_intent_scheme"/>
             </intent-filter>
         </receiver>
+        <service android:name=".services.ExpiryUpdateService" android:exported="false" />
     </application>
 
 </manifest>

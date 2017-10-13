@@ -63,7 +63,7 @@ public class MainCursorAdapter extends CursorAdapter {
             @Override
             public void onClick(View view) {
                 final ContentValues cv = new ContentValues();
-                cv.put(TodoEntry.COLUMN_NAME_TASK_DONE, 1);
+                cv.put(TodoEntry.COLUMN_NAME_TASK_DONE, TodoEntry.TASK_COMPLETED);
                 cv.put(TodoEntry.COLUMN_NAME_COMPLETED_DATE, System.currentTimeMillis());
                 Uri aUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
                 view.getContext().getContentResolver().update(aUri, cv, null, null);
