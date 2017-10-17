@@ -8,7 +8,14 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.ScrollView;
 
+import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.adapter.MainCursorAdapter;
 import com.example.daniel.todule_android.provider.ToduleDBContract;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
@@ -17,18 +24,34 @@ import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
  * Created by danieL on 8/1/2017.
  */
 
-public class ToduleListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ToduleListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener {
     private static final int LOADER_ID = 1;
     MainCursorAdapter mAdapter;
+    private ListView listView;
+    private ScrollView emptyView;
+    private SwipeRefreshLayout swipeContainer;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setEmptyText("No entry found");
         mAdapter = new MainCursorAdapter(getActivity(), null, 0);
-        setListAdapter(mAdapter);
+
+        listView.setAdapter(mAdapter);
+        listView.setEmptyView(emptyView);
+
         getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+
+        swipeContainer  = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipe_container);
+        swipeContainer.setOnRefreshListener(this);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_list_view, container, false);
+        listView = view.findViewById(android.R.id.list);
+        emptyView = view.findViewById(android.R.id.empty);
+        return view;
     }
 
     @Override
@@ -47,6 +70,12 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
         // Swap the new cursor in.  (The framework will take care of closing the
         // old cursor once we return.)
         mAdapter.swapCursor(data);
+        swipeContainer.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeContainer.setRefreshing(false);
+            }
+        });
     }
 
     @Override
@@ -57,5 +86,8 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
         mAdapter.swapCursor(null);
     }
 
-
+    @Override
+    public void onRefresh() {
+        getActivity().getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
+    }
 }
