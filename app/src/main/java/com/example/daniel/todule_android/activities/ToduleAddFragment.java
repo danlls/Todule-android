@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -233,6 +234,12 @@ public class ToduleAddFragment extends Fragment{
 
         PendingIntent sender = PendingIntent.getService(getContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager am = (AlarmManager) myActivity.getSystemService(Context.ALARM_SERVICE);
-        am.set(AlarmManager.RTC, datetimeInMillis, sender);
+        if(Build.VERSION.SDK_INT >= 23){
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC, datetimeInMillis, sender);
+        } else if (Build.VERSION.SDK_INT >= 19) {
+            am.setExact(AlarmManager.RTC, datetimeInMillis, sender);
+        } else {
+            am.set(AlarmManager.RTC, datetimeInMillis, sender);
+        }
     }
 }
