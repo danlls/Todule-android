@@ -10,4 +10,6 @@
     <color name="black">#000000</color>
     <color name="normalGreen">#4CAF50</color>
     <color name="pressedGreen">#388E3C</color>
+    <color name="normalGrey">#EEEEEE</color>
+    <color name="pressedGrey">#BDBDBD</color>
 </resources>

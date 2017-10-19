@@ -40,12 +40,12 @@ public class HistoryAdapter extends CursorAdapter{
                 long completed_date = cursor.getLong(cursor.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_COMPLETED_DATE));
                 holder.completed.setText(DateUtils.formatDateTime(context, completed_date, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_TIME));
                 // Add green tick at the start of text
-                Drawable tickDrawable = context.getDrawable(R.drawable.ic_done_black_18dp);
+                Drawable tickDrawable = context.getDrawable(R.drawable.ic_done_white_18dp);
                 tickDrawable.setTint(ContextCompat.getColor(context, R.color.normalGreen));
                 holder.completed.setCompoundDrawablesRelativeWithIntrinsicBounds(tickDrawable, null, null, null);
                 break;
-            case ToduleDBContract.TodoEntry.TASK_EXPIRED:
-                holder.completed.setText(R.string.expired);
+            case ToduleDBContract.TodoEntry.TASK_NOT_COMPLETED:
+                holder.completed.setText(R.string.not_done);
                 // Add red cross at the start of text
                 Drawable crossDrawable = context.getDrawable(R.drawable.ic_clear_black_18dp);
                 crossDrawable.setTint(ContextCompat.getColor(context, R.color.red));

@@ -18,7 +18,8 @@ public class ToduleDBHelper extends SQLiteOpenHelper{
                     TodoEntry.COLUMN_NAME_CREATED_DATE + " INTEGER," +
                     TodoEntry.COLUMN_NAME_DUE_DATE + " INTEGER," +
                     TodoEntry.COLUMN_NAME_TASK_DONE + " INTEGER DEFAULT 0," +
-                    TodoEntry.COLUMN_NAME_COMPLETED_DATE + " INTEGER DEFAULT NULL" +
+                    TodoEntry.COLUMN_NAME_COMPLETED_DATE + " INTEGER DEFAULT NULL, " +
+                    TodoEntry.COLUMN_NAME_ARCHIVED + " INTEGER DEFAULT 0, " +
                     ");";
 
 
@@ -26,7 +27,7 @@ public class ToduleDBHelper extends SQLiteOpenHelper{
             "DROP TABLE IF EXISTS " + TodoEntry.TABLE_NAME;
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 6;
+    public static final int DATABASE_VERSION = 7;
     public static final String DATABASE_NAME = "Todule.db";
 
     public ToduleDBHelper(Context context) {
@@ -40,7 +41,10 @@ public class ToduleDBHelper extends SQLiteOpenHelper{
         // to simply to discard the data and start over
         if (oldVersion < 6) {
             db.execSQL("ALTER TABLE " + TodoEntry.TABLE_NAME + " ADD COLUMN " + TodoEntry.COLUMN_NAME_COMPLETED_DATE + " INTEGER");
-        } else {
+        } else if (oldVersion < 7) {
+            db.execSQL("ALTER TABLE " + TodoEntry.TABLE_NAME + " ADD COLUMN " + TodoEntry.COLUMN_NAME_ARCHIVED + " INTEGER DEFAULT 0 ");
+        }
+        else {
             db.execSQL(SQL_DELETE_ENTRIES);
             db.execSQL(SQL_CREATE_ENTRIES);
         }

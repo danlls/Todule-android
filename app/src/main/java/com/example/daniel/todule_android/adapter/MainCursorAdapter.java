@@ -64,6 +64,7 @@ public class MainCursorAdapter extends CursorAdapter {
             public void onClick(View view) {
                 final ContentValues cv = new ContentValues();
                 cv.put(TodoEntry.COLUMN_NAME_TASK_DONE, TodoEntry.TASK_COMPLETED);
+                cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, 1);
                 cv.put(TodoEntry.COLUMN_NAME_COMPLETED_DATE, System.currentTimeMillis());
                 Uri aUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
                 view.getContext().getContentResolver().update(aUri, cv, null, null);
@@ -71,12 +72,33 @@ public class MainCursorAdapter extends CursorAdapter {
                 mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        cv.put(TodoEntry.COLUMN_NAME_TASK_DONE, 0);
+                        cv.put(TodoEntry.COLUMN_NAME_TASK_DONE, TodoEntry.TASK_NOT_COMPLETED);
+                        cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, 0);
+                        cv.putNull(TodoEntry.COLUMN_NAME_COMPLETED_DATE);
                         Uri aUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
                         view.getContext().getContentResolver().update(aUri, cv, null, null);
                     }
                 });
                 mySnackbar.show();
+            }
+        });
+
+        holder.archiveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final ContentValues cv = new ContentValues();
+                cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, 1);
+                Uri aUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
+                view.getContext().getContentResolver().update(aUri, cv, null, null);
+                Snackbar mySnackbar = Snackbar.make(view, R.string.entry_archived, Snackbar.LENGTH_LONG);
+                mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, 0);
+                        Uri aUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
+                        view.getContext().getContentResolver().update(aUri, cv, null, null);
+                    }
+                });
             }
         });
 
@@ -104,6 +126,7 @@ public class MainCursorAdapter extends CursorAdapter {
         holder.dueDate = rowView.findViewById(R.id.due_text);
         holder.countdown = rowView.findViewById(R.id.countdown_text);
         holder.doneButton =  rowView.findViewById(R.id.done_button);
+        holder.archiveButton = rowView.findViewById(R.id.archive_button);
         rowView.setTag(holder);
         return rowView;
     }
@@ -114,6 +137,7 @@ public class MainCursorAdapter extends CursorAdapter {
         TextView dueDate;
         TextView countdown;
         Button doneButton;
+        Button archiveButton;
     }
 
 }

@@ -31,7 +31,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_marginLeft="16dp"
-        android:drawableLeft="@drawable/ic_alarm_black_18dp"
+        android:drawableStart="@drawable/ic_alarm_black_18dp"
         android:drawablePadding="5dp" />
 
     <TextView
@@ -39,20 +39,40 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/title_text"
         android:id="@+id/due_text"
-        android:drawableLeft="@drawable/ic_date_range_black_18dp"
+        android:drawableStart="@drawable/ic_date_range_black_18dp"
         android:drawablePadding="3dp"
         android:paddingTop="3dp" />
 
-    <Button
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/done_button"
-        android:layout_below="@id/description_text"
-        android:drawableLeft="@drawable/ic_done_black_18dp"
-        android:drawableTint="@color/white"
-        android:textColor="@color/white"
-        android:background="@drawable/done_raised_bg"
-        android:text="@string/mark_done"
-        android:elevation="2dp" />
+        android:orientation="horizontal"
+        android:layout_below="@+id/description_text">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/archive_button"
+            android:drawableStart="@drawable/ic_archive_black_18dp"
+            android:background="@drawable/archive_raised_bg"
+            android:textColor="@color/black"
+            android:text="@string/archive"
+            android:elevation="2dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="3dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/done_button"
+            android:drawableStart="@drawable/ic_done_white_18dp"
+            android:textColor="@color/white"
+            android:background="@drawable/done_raised_bg"
+            android:text="@string/mark_done"
+            android:elevation="2dp" />
+
+    </LinearLayout>
+
+
 
 </RelativeLayout>

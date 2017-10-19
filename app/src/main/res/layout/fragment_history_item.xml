@@ -29,7 +29,7 @@
         android:id="@+id/completed_date_text"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:drawableLeft="@drawable/ic_done_black_18dp"
+        android:drawableLeft="@drawable/ic_done_white_18dp"
         android:drawableTint="@color/normalGreen"/>
 
 </RelativeLayout>
