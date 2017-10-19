@@ -1,5 +1,6 @@
 package com.example.daniel.todule_android.activities;
 
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,7 +9,12 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
+import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.adapter.HistoryAdapter;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
 
@@ -28,6 +34,7 @@ public class ToduleHistoryFragment extends ListFragment implements LoaderManager
         mAdapter = new HistoryAdapter(getActivity(), null, 0);
         setListAdapter(mAdapter);
         getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -54,5 +61,40 @@ public class ToduleHistoryFragment extends ListFragment implements LoaderManager
         // Swap the new cursor in.  (The framework will take care of closing the
         // old cursor once we return.)
         mAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_fragment_history, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.action_clear_history:
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setMessage(getString(R.string.clear_history_dialog_msg) + "\n(This action is irreversible)");
+                builder.setTitle(R.string.clear_history_dialog_title);
+                builder.setPositiveButton(R.string.clear_history_dialog_positive, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User clicked OK button
+                        String selectionClause = TodoEntry.COLUMN_NAME_ARCHIVED + " = ?";
+                        String[] selectionArgs = {"1"};
+                        getContext().getContentResolver().delete(TodoEntry.CONTENT_URI, selectionClause, selectionArgs);
+                    }
+                });
+                builder.setNegativeButton(R.string.clear_history_dialog_negative, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
     }
 }

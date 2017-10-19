@@ -16,4 +16,9 @@
     <string name="reminder_intent_scheme">todule-reminder:</string>
     <string name="not_done">Not done</string>
     <string name="archive">Archive</string>
+    <string name="clear_history">Clear History</string>
+    <string name="clear_history_dialog_msg">Delete all of history?</string>
+    <string name="clear_history_dialog_title">Clear history</string>
+    <string name="clear_history_dialog_positive">Clear All</string>
+    <string name="clear_history_dialog_negative">Cancel</string>
 </resources>
