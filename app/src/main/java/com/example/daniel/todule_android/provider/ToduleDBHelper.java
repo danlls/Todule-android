@@ -19,7 +19,7 @@ public class ToduleDBHelper extends SQLiteOpenHelper{
                     TodoEntry.COLUMN_NAME_DUE_DATE + " INTEGER," +
                     TodoEntry.COLUMN_NAME_TASK_DONE + " INTEGER DEFAULT 0," +
                     TodoEntry.COLUMN_NAME_COMPLETED_DATE + " INTEGER DEFAULT NULL, " +
-                    TodoEntry.COLUMN_NAME_ARCHIVED + " INTEGER DEFAULT 0, " +
+                    TodoEntry.COLUMN_NAME_ARCHIVED + " INTEGER DEFAULT 0" +
                     ");";
 
 
