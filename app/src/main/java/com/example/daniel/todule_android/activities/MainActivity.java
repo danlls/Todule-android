@@ -15,6 +15,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -69,10 +71,28 @@ public class MainActivity extends AppCompatActivity{
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {;
-                final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, new ToduleAddFragment());
                 ft.addToBackStack(null);
                 ft.commit();
+            }
+        });
+
+        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                int backStackEntryCount = getSupportFragmentManager().getBackStackEntryCount();
+                if(backStackEntryCount > 0){
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    fabVisibility(false);
+                    findViewById(R.id.toolbar).setVisibility(View.GONE);
+                }else{
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                    getSupportActionBar().setTitle("Todule");
+                    fabVisibility(true);
+                    findViewById(R.id.toolbar).setVisibility(View.VISIBLE);
+
+                }
             }
         });
 

@@ -39,9 +39,7 @@ public class ToduleAddFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         myActivity = (MainActivity) getActivity();
         View view = inflater.inflate(R.layout.fragment_add, container, false);
-        myActivity.fabVisibility(false);
-        getActivity().findViewById(R.id.toolbar).setVisibility(View.GONE);
-        myActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        myActivity.getSupportActionBar().setTitle("New entry");
         setHasOptionsMenu(true);
 
         EditText titleEdit = view.findViewById(R.id.edit_title);
@@ -147,6 +145,7 @@ public class ToduleAddFragment extends Fragment{
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
         inflater.inflate(R.menu.menu_fragment_add, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -185,15 +184,6 @@ public class ToduleAddFragment extends Fragment{
         Uri itemUri = getContext().getContentResolver().insert(TodoEntry.CONTENT_URI, cv);
         // Reminder set at one minute before due_date
         myActivity.setReminder(itemUri, due_date - 60 * 60 * 1000);
-    }
-
-    @Override
-    public void onDestroyView() {
-        myActivity.fabVisibility(true);
-        getActivity().findViewById(R.id.toolbar).setVisibility(View.VISIBLE);
-        myActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-
-        super.onDestroyView();
     }
 
     private boolean validateInputs() {

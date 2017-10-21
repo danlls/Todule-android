@@ -21,4 +21,6 @@
     <string name="clear_history_dialog_title">Clear history</string>
     <string name="clear_history_dialog_positive">Clear All</string>
     <string name="clear_history_dialog_negative">Cancel</string>
+    <string name="label_setting">Labels</string>
+    <string name="label_preview">Preview: </string>
 </resources>

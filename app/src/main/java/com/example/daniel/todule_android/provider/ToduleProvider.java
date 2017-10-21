@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
+import com.example.daniel.todule_android.provider.ToduleDBContract.TodoLabel;
 
 /**
  * Created by danieL on 7/31/2017.
@@ -20,12 +21,16 @@ public class ToduleProvider extends ContentProvider{
     // UriMatcher constants
     private static final int ENTRY_LIST = 1;
     private static final int ENTRY_ID = 2;
+    private static final int LABEL_LIST = 3;
+    private static final int LABEL_ID = 4;
 
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
         sUriMatcher.addURI("com.example.todule.provider", "todo_entry", ENTRY_LIST);
         sUriMatcher.addURI("com.example.todule.provider", "todo_entry/#", ENTRY_ID);
+        sUriMatcher.addURI("com.example.todule.provider", "todo_label", LABEL_LIST);
+        sUriMatcher.addURI("com.example.todule.provider", "todo_label/#", LABEL_ID);
     }
 
     private ToduleDBHelper tOpenHelper;
@@ -53,7 +58,16 @@ public class ToduleProvider extends ContentProvider{
             // Single row
             case ENTRY_ID:
                 builder.setTables(TodoEntry.TABLE_NAME);
-
+                builder.appendWhere("_ID = " + uri.getLastPathSegment());
+                break;
+            case LABEL_LIST:
+                builder.setTables(TodoLabel.TABLE_NAME);
+                if (TextUtils.isEmpty(sortOrder)) {
+                    sortOrder = TodoEntry.SORT_ORDER_DEFAULT;
+                }
+                break;
+            case LABEL_ID:
+                builder.setTables(TodoLabel.TABLE_NAME);
                 builder.appendWhere("_ID = " + uri.getLastPathSegment());
                 break;
             default:
@@ -78,17 +92,28 @@ public class ToduleProvider extends ContentProvider{
                 return ToduleDBContract.TodoEntry.CONTENT_TYPE;
             case ENTRY_ID:
                 return ToduleDBContract.TodoEntry.CONTENT_ITEM_TYPE;
+            case LABEL_LIST:
+                return TodoLabel.CONTENT_TYPE;
+            case LABEL_ID:
+                return TodoLabel.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
     }
 
     public Uri insert(Uri uri, ContentValues values){
-        if (sUriMatcher.match(uri) != ENTRY_LIST){
-            throw new IllegalArgumentException("Unsupported URI for insertion: " + uri);
-        }
         db = tOpenHelper.getWritableDatabase();
-        long id = db.insert(TodoEntry.TABLE_NAME, null, values);
+        long id;
+        switch(sUriMatcher.match(uri)){
+            case ENTRY_LIST:
+                id = db.insert(TodoEntry.TABLE_NAME, null, values);
+                break;
+            case LABEL_LIST:
+                id = db.insert(TodoLabel.TABLE_NAME, null, values);
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported URI for insertion: " + uri);
+        }
         Uri itemUri = ContentUris.withAppendedId(uri, id);
         getContext().getContentResolver().notifyChange(itemUri, null);
         return itemUri;
@@ -97,17 +122,29 @@ public class ToduleProvider extends ContentProvider{
     public int delete(Uri uri, String selection, String[] selectionArgs){
         db = tOpenHelper.getWritableDatabase();
         int count = 0;
+        String idStr, where;
         switch(sUriMatcher.match(uri)) {
             case ENTRY_LIST:
                 count = db.delete(TodoEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case ENTRY_ID:
-                String idStr = uri.getLastPathSegment();
-                String where = TodoEntry._ID + " = " + idStr;
+                idStr = uri.getLastPathSegment();
+                where = TodoEntry._ID + " = " + idStr;
                 if (!TextUtils.isEmpty(selection)) {
                     where += " AND " + selection;
                 }
                 count = db.delete(TodoEntry.TABLE_NAME, where, selectionArgs);
+                break;
+            case LABEL_LIST:
+                count = db.delete(TodoLabel.TABLE_NAME, selection, selectionArgs);
+                break;
+            case LABEL_ID:
+                idStr = uri.getLastPathSegment();
+                where = TodoLabel._ID + " = " + idStr;
+                if (!TextUtils.isEmpty(selection)) {
+                    where += " AND " + selection;
+                }
+                count = db.delete(TodoLabel.TABLE_NAME, where, selectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
@@ -121,17 +158,30 @@ public class ToduleProvider extends ContentProvider{
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs){
         db = tOpenHelper.getWritableDatabase();
         int count = 0;
+        String idStr, where;
         switch(sUriMatcher.match(uri)) {
             case ENTRY_LIST:
                 count = db.update(TodoEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             case ENTRY_ID:
-                String idStr = uri.getLastPathSegment();
-                String where = TodoEntry._ID + " = " + idStr;
+                idStr = uri.getLastPathSegment();
+                where = TodoEntry._ID + " = " + idStr;
                 if (!TextUtils.isEmpty(selection)) {
                     where += " AND " + selection;
                 }
                 count = db.update(TodoEntry.TABLE_NAME, values, where,
+                        selectionArgs);
+                break;
+            case LABEL_LIST:
+                count = db.update(TodoLabel.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case LABEL_ID:
+                idStr = uri.getLastPathSegment();
+                where = TodoLabel._ID + " = " + idStr;
+                if (!TextUtils.isEmpty(selection)) {
+                    where += " AND " + selection;
+                }
+                count = db.update(TodoLabel.TABLE_NAME, values, where,
                         selectionArgs);
                 break;
             default:

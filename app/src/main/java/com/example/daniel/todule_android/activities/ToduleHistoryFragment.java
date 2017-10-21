@@ -65,6 +65,7 @@ public class ToduleHistoryFragment extends ListFragment implements LoaderManager
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
         inflater.inflate(R.menu.menu_fragment_history, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
