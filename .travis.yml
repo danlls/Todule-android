@@ -22,4 +22,4 @@ licenses:
     - 'google-gdk-license-.+'
 
 script:
-    - ./gradlew check lint assembleDebug
+    - ./gradlew check lint assembleDebug --stacktrace
