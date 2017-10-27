@@ -40,12 +40,6 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
     boolean selecting;
 
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -89,7 +83,6 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
     public void onStart() {
         super.onStart();
         if(selecting) {
-            Log.i("selected-label-id>", String.valueOf(selectedLabelId));
             if (selectedLabelId == 0){
                 // Set headerview as checked
                 getListView().setItemChecked(0, true);
@@ -108,7 +101,9 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong("selected_label_id", selectedLabelId);
+        if(selectedLabelId != null){
+            outState.putLong("selected_label_id", selectedLabelId);
+        }
     }
 
     @Override
@@ -176,14 +171,12 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.i("Labelselectpos>>", String.valueOf(i));
                 if(i == 0){
                     // If user choose the headerview "no label"
                     mCallback.onLabelSelected(-1);
                 } else {
                     Cursor cr = (Cursor) adapterView.getItemAtPosition(i);
                     selectedLabelId = cr.getLong(cr.getColumnIndexOrThrow(TodoLabel._ID));
-                    Log.i("Labelselectid>>", String.valueOf(selectedLabelId));
                     mCallback.onLabelSelected(selectedLabelId);
                 }
             }

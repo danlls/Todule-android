@@ -66,11 +66,16 @@ public class ToduleLabelAddFragment extends Fragment {
                 preview_text.setBackgroundColor(i);
                 Bitmap image = Bitmap.createBitmap(5, 5, Bitmap.Config.ARGB_8888);
                 image.eraseColor(i);
-                Palette p = Palette.from(image).generate();
-                Palette.Swatch vibrant = p.getVibrantSwatch();
-                if (vibrant != null) {
-                    preview_text.setTextColor(vibrant.getTitleTextColor());
-                }
+                Palette.from(image).generate(new Palette.PaletteAsyncListener() {
+                    @Override
+                    public void onGenerated(Palette palette) {
+                        Palette.Swatch vibrant = palette.getVibrantSwatch();
+                        if (vibrant != null) {
+                            preview_text.setTextColor(vibrant.getTitleTextColor());
+                        }
+                    }
+                });
+
             }
         });
 

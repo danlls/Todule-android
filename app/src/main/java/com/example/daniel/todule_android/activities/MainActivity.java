@@ -76,24 +76,27 @@ public class MainActivity extends AppCompatActivity implements ToduleLabelFragme
             }
         });
 
+        updateFragmentPresentation();
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
-                int backStackEntryCount = getSupportFragmentManager().getBackStackEntryCount();
-                if(backStackEntryCount > 0){
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                    fabVisibility(false);
-                    findViewById(R.id.toolbar).setVisibility(View.GONE);
-                }else{
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                    getSupportActionBar().setTitle("Todule");
-                    fabVisibility(true);
-                    findViewById(R.id.toolbar).setVisibility(View.VISIBLE);
-
-                }
+                updateFragmentPresentation();
             }
         });
+    }
 
+    private void updateFragmentPresentation(){
+        int backStackEntryCount = getSupportFragmentManager().getBackStackEntryCount();
+        if(backStackEntryCount > 0){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            fabVisibility(false);
+            findViewById(R.id.toolbar).setVisibility(View.GONE);
+        }else{
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            getSupportActionBar().setTitle("Todule");
+            fabVisibility(true);
+            findViewById(R.id.toolbar).setVisibility(View.VISIBLE);
+        }
     }
 
     public void fabVisibility(boolean show){
