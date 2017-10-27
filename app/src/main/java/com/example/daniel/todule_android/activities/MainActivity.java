@@ -24,7 +24,7 @@ import com.example.daniel.todule_android.provider.ToduleDBContract;
 import com.example.daniel.todule_android.utilities.DateTimeUtils;
 
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements ToduleLabelFragment.OnLabelSelectedListener{
 
     MyPagerAdapter myPagerAdapter;
     ViewPager mViewPager;
@@ -69,10 +69,28 @@ public class MainActivity extends AppCompatActivity{
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {;
-                final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container, new ToduleAddFragment());
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_container, new ToduleAddFragment(), "add_frag");
                 ft.addToBackStack(null);
                 ft.commit();
+            }
+        });
+
+        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                int backStackEntryCount = getSupportFragmentManager().getBackStackEntryCount();
+                if(backStackEntryCount > 0){
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    fabVisibility(false);
+                    findViewById(R.id.toolbar).setVisibility(View.GONE);
+                }else{
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                    getSupportActionBar().setTitle("Todule");
+                    fabVisibility(true);
+                    findViewById(R.id.toolbar).setVisibility(View.VISIBLE);
+
+                }
             }
         });
 
@@ -172,6 +190,15 @@ public class MainActivity extends AppCompatActivity{
 
         AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
         am.set(AlarmManager.RTC_WAKEUP, datetimeInMillis, sender);
+
+        cr.close();
+    }
+
+    @Override
+    public void onLabelSelected(long id) {
+
+        ToduleAddFragment toduleAddFragment = (ToduleAddFragment) getSupportFragmentManager().findFragmentByTag("add_frag");
+        toduleAddFragment.setLabel(id);
     }
 }
 

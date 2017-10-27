@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.daniel.todule_android.R;
+import com.example.daniel.todule_android.provider.ToduleDBContract;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
 import com.example.daniel.todule_android.utilities.DateTimeUtils;
 
@@ -43,6 +44,23 @@ public class MainCursorAdapter extends CursorAdapter {
         long dueDate = cursor.getLong(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_DUE_DATE));
         String dueDateString = DateUtils.formatDateTime(context, dueDate, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_TIME);
         String countdownString =  DateTimeUtils.dateTimeDiff(dueDate);
+        if (!cursor.isNull(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_LABEL))){
+            Long labelId = cursor.getLong(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_LABEL));
+            Uri labelUri = ContentUris.withAppendedId(ToduleDBContract.TodoLabel.CONTENT_ID_URI_BASE, labelId);
+            Cursor cr = context.getContentResolver().query(labelUri, ToduleDBContract.TodoLabel.PROJECTION_ALL, null, null, ToduleDBContract.TodoLabel.SORT_ORDER_DEFAULT);
+
+            cr.moveToFirst();
+            String labelText = cr.getString(cr.getColumnIndexOrThrow(ToduleDBContract.TodoLabel.COLUMN_NAME_TAG));
+            int textColor = cr.getInt(cr.getColumnIndexOrThrow(ToduleDBContract.TodoLabel.COLUMN_NAME_TEXT_COLOR));
+            int color = cr.getInt(cr.getColumnIndexOrThrow(ToduleDBContract.TodoLabel.COLUMN_NAME_COLOR));
+            holder.label.setText(labelText);
+            holder.label.setTextColor(textColor);
+            holder.label.setBackgroundColor(color);
+            cr.close();
+        } else {
+            holder.label.setVisibility(View.GONE);
+        }
+
 
         holder.title.setText(title);
         if(!description.isEmpty()){
@@ -125,6 +143,7 @@ public class MainCursorAdapter extends CursorAdapter {
         holder.description = rowView.findViewById(R.id.description_text);
         holder.dueDate = rowView.findViewById(R.id.due_text);
         holder.countdown = rowView.findViewById(R.id.countdown_text);
+        holder.label = rowView.findViewById(R.id.entry_label);
         holder.doneButton =  rowView.findViewById(R.id.done_button);
         holder.archiveButton = rowView.findViewById(R.id.archive_button);
         rowView.setTag(holder);
@@ -136,6 +155,7 @@ public class MainCursorAdapter extends CursorAdapter {
         TextView description;
         TextView dueDate;
         TextView countdown;
+        TextView label;
         Button doneButton;
         Button archiveButton;
     }

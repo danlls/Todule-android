@@ -2,8 +2,10 @@ package com.example.daniel.todule_android.activities;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,12 +19,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.daniel.todule_android.R;
+import com.example.daniel.todule_android.adapter.LabelAdapter;
+import com.example.daniel.todule_android.provider.ToduleDBContract;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
 
 import java.text.DateFormat;
@@ -35,13 +41,13 @@ import java.util.Calendar;
 public class ToduleAddFragment extends Fragment{
     Calendar myCalendar = Calendar.getInstance();
     MainActivity myActivity;
+    Long chosenLabelId = null;
+
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         myActivity = (MainActivity) getActivity();
         View view = inflater.inflate(R.layout.fragment_add, container, false);
-        myActivity.fabVisibility(false);
-        getActivity().findViewById(R.id.toolbar).setVisibility(View.GONE);
-        myActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        myActivity.getSupportActionBar().setTitle("New entry");
         setHasOptionsMenu(true);
 
         EditText titleEdit = view.findViewById(R.id.edit_title);
@@ -142,11 +148,54 @@ public class ToduleAddFragment extends Fragment{
             }
         }, 200);
 
+        Button selectLabel = view.findViewById(R.id.select_label);
+        selectLabel.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                ToduleLabelFragment labelFrag = new ToduleLabelFragment();
+                Bundle args = new Bundle();
+                args.putBoolean("select", true);
+                if(chosenLabelId != null){
+                    args.putLong("selected_label_id", chosenLabelId);
+                }
+                labelFrag.setArguments(args);
+                myActivity.getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, labelFrag)
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
+        TextView chosenLabel = view.findViewById(R.id.chosen_label);
+
+        if(chosenLabelId != null) {
+            Uri labelUri = ContentUris.withAppendedId(ToduleDBContract.TodoLabel.CONTENT_ID_URI_BASE, chosenLabelId);
+            Cursor cr = getContext().getContentResolver().query(labelUri, ToduleDBContract.TodoLabel.PROJECTION_ALL, null, null, ToduleDBContract.TodoLabel.SORT_ORDER_DEFAULT);
+
+            cr.moveToFirst();
+            String labelText = cr.getString(cr.getColumnIndexOrThrow(ToduleDBContract.TodoLabel.COLUMN_NAME_TAG));
+            int textColor = cr.getInt(cr.getColumnIndexOrThrow(ToduleDBContract.TodoLabel.COLUMN_NAME_TEXT_COLOR));
+            int color = cr.getInt(cr.getColumnIndexOrThrow(ToduleDBContract.TodoLabel.COLUMN_NAME_COLOR));
+            chosenLabel.setText(labelText);
+            chosenLabel.setTextColor(textColor);
+            chosenLabel.setBackgroundColor(color);
+            cr.close();
+        } else {
+            chosenLabel.setText(R.string.no_label);
+        }
+
         return view;
     }
 
     @Override
+    public void onDestroy() {
+        chosenLabelId = null;
+        super.onDestroy();
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
         inflater.inflate(R.menu.menu_fragment_add, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -182,18 +231,14 @@ public class ToduleAddFragment extends Fragment{
         cv.put(TodoEntry.COLUMN_NAME_DESCRIPTION, description_text);
         cv.put(TodoEntry.COLUMN_NAME_DUE_DATE, due_date);
         cv.put(TodoEntry.COLUMN_NAME_CREATED_DATE, created_date);
+        if(chosenLabelId == null){
+            cv.putNull(TodoEntry.COLUMN_NAME_LABEL);
+        } else {
+            cv.put(TodoEntry.COLUMN_NAME_LABEL, chosenLabelId);
+        }
         Uri itemUri = getContext().getContentResolver().insert(TodoEntry.CONTENT_URI, cv);
         // Reminder set at one minute before due_date
         myActivity.setReminder(itemUri, due_date - 60 * 60 * 1000);
-    }
-
-    @Override
-    public void onDestroyView() {
-        myActivity.fabVisibility(true);
-        getActivity().findViewById(R.id.toolbar).setVisibility(View.VISIBLE);
-        myActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-
-        super.onDestroyView();
     }
 
     private boolean validateInputs() {
@@ -217,6 +262,14 @@ public class ToduleAddFragment extends Fragment{
         }
 
         return valid;
+    }
+
+    public void setLabel(long id){
+        if( id < 0){
+            chosenLabelId = null;
+        } else {
+            chosenLabelId = id;
+        }
     }
 
 }
