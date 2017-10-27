@@ -15,8 +15,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -26,7 +24,7 @@ import com.example.daniel.todule_android.provider.ToduleDBContract;
 import com.example.daniel.todule_android.utilities.DateTimeUtils;
 
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements ToduleLabelFragment.OnLabelSelectedListener{
 
     MyPagerAdapter myPagerAdapter;
     ViewPager mViewPager;
@@ -72,7 +70,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {;
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container, new ToduleAddFragment());
+                ft.replace(R.id.fragment_container, new ToduleAddFragment(), "add_frag");
                 ft.addToBackStack(null);
                 ft.commit();
             }
@@ -192,6 +190,15 @@ public class MainActivity extends AppCompatActivity{
 
         AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
         am.set(AlarmManager.RTC_WAKEUP, datetimeInMillis, sender);
+
+        cr.close();
+    }
+
+    @Override
+    public void onLabelSelected(long id) {
+
+        ToduleAddFragment toduleAddFragment = (ToduleAddFragment) getSupportFragmentManager().findFragmentByTag("add_frag");
+        toduleAddFragment.setLabel(id);
     }
 }
 

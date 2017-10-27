@@ -12,7 +12,7 @@
     <string name="entry_done">Entry marked as done</string>
     <string name="entry_archived">Entry archived</string>
     <string name="undo_string">Undo</string>
-    <string name="no_descrption">- No description -</string>
+    <string name="no_descrption">&lt; No description &gt;</string>
     <string name="reminder_intent_scheme">todule-reminder:</string>
     <string name="not_done">Not done</string>
     <string name="archive">Archive</string>
@@ -23,4 +23,8 @@
     <string name="clear_history_dialog_negative">Cancel</string>
     <string name="label_setting">Labels</string>
     <string name="label_preview">Preview: </string>
+    <string name="no_label">&lt; No label selected &gt;</string>
+    <string name="text_label">Label:</string>
+    <string name="select_label">Select</string>
+    <string name="todule_label_add_page_title">New label</string>
 </resources>
