@@ -159,6 +159,7 @@ public class ToduleAddFragment extends Fragment{
                     args.putLong("selected_label_id", chosenLabelId);
                 }
                 labelFrag.setArguments(args);
+                myActivity.hideSoftKeyboard(true);
                 myActivity.getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, labelFrag)
                         .addToBackStack(null)

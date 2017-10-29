@@ -31,16 +31,17 @@ public class ToduleLabelAddFragment extends Fragment {
     MainActivity myActivity;
     ColorPickerView cpView;
     TextView preview_text;
+    EditText tag_edit;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         myActivity = (MainActivity) getActivity();
-        myActivity.getSupportActionBar().setTitle("New Label");
+        myActivity.getSupportActionBar().setTitle("New label");
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_label_add, container, false);
 
-        EditText tag_edit = view.findViewById(R.id.tag_edit);
+        tag_edit = view.findViewById(R.id.tag_edit);
         preview_text = view.findViewById(R.id.preview_label);
 
         tag_edit.addTextChangedListener(new TextWatcher() {
@@ -63,6 +64,8 @@ public class ToduleLabelAddFragment extends Fragment {
         cpView.addOnColorChangedListener(new OnColorChangedListener() {
             @Override
             public void onColorChanged(int i) {
+                tag_edit.clearFocus();
+                myActivity.hideSoftKeyboard(true);
                 preview_text.setBackgroundColor(i);
                 Bitmap image = Bitmap.createBitmap(5, 5, Bitmap.Config.ARGB_8888);
                 image.eraseColor(i);
@@ -79,6 +82,13 @@ public class ToduleLabelAddFragment extends Fragment {
             }
         });
 
+        tag_edit.requestFocus();
+        tag_edit.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                myActivity.hideSoftKeyboard(false);
+            }
+        }, 200);
         return view;
     }
 

@@ -35,7 +35,6 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
     LabelAdapter lAdapter;
     MainActivity myActivity;
     OnLabelSelectedListener mCallback;
-    static final String ARG_POSITION = "label_position";
     Long selectedLabelId = null;
     boolean selecting;
 
