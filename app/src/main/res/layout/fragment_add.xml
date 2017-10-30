@@ -38,7 +38,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/text_title"
             android:id="@+id/edit_title"
-            android:inputType="textCapSentences|textAutoCorrect|textMultiLine"/>
+            android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
+            android:imeOptions="flagNoExtractUi"/>
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -49,7 +50,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/text_description"
             android:id="@+id/edit_description"
-            android:inputType="textCapSentences|textAutoCorrect|textMultiLine"/>
+            android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
+            android:imeOptions="flagNoExtractUi"/>
     </android.support.design.widget.TextInputLayout>
 
     <LinearLayout

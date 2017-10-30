@@ -50,7 +50,8 @@
             android:maxLength="25"
             android:maxLines="1"
             android:lines="1"
-            android:inputType="textNoSuggestions" />
+            android:inputType="textNoSuggestions"
+            android:imeOptions="flagNoExtractUi"/>
     </android.support.design.widget.TextInputLayout>
 
 

@@ -13,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,20 +40,31 @@ import java.util.Calendar;
  */
 
 public class ToduleAddFragment extends Fragment{
-    Calendar myCalendar = Calendar.getInstance();
+    Calendar myCalendar;
     MainActivity myActivity;
-    Long chosenLabelId = null;
+    Long chosenLabelId = -1L;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if(savedInstanceState != null){
+            myCalendar = (Calendar) savedInstanceState.getSerializable("calendar");
+            chosenLabelId = savedInstanceState.getLong("chosen_label_id", -1L);
+        } else {
+            // Set default
+            myCalendar = Calendar.getInstance();
+            myCalendar.set(Calendar.HOUR_OF_DAY, 23);
+            myCalendar.set(Calendar.MINUTE, 59);
+            myCalendar.set(Calendar.SECOND, 0);
+        }
+    }
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         myActivity = (MainActivity) getActivity();
         View view = inflater.inflate(R.layout.fragment_add, container, false);
         myActivity.getSupportActionBar().setTitle("New entry");
         setHasOptionsMenu(true);
-
-        if(savedInstanceState != null){
-            chosenLabelId = savedInstanceState.getLong("chosen_label_id");
-        }
 
         EditText titleEdit = view.findViewById(R.id.edit_title);
         final EditText dateEdit = view.findViewById(R.id.edit_date);
@@ -135,10 +147,6 @@ public class ToduleAddFragment extends Fragment{
             }
         });
 
-        // Set default
-        myCalendar.set(Calendar.HOUR_OF_DAY, 23);
-        myCalendar.set(Calendar.MINUTE, 59);
-        myCalendar.set(Calendar.SECOND, 0);
         DateFormat df = DateFormat.getDateInstance();
         dateEdit.setText(df.format(myCalendar.getTime()));
         DateFormat df2 = DateFormat.getTimeInstance(DateFormat.SHORT);
@@ -159,7 +167,7 @@ public class ToduleAddFragment extends Fragment{
                 ToduleLabelFragment labelFrag = new ToduleLabelFragment();
                 Bundle args = new Bundle();
                 args.putBoolean("select", true);
-                if(chosenLabelId != null){
+                if(chosenLabelId != -1L){
                     args.putLong("selected_label_id", chosenLabelId);
                 }
                 labelFrag.setArguments(args);
@@ -173,7 +181,7 @@ public class ToduleAddFragment extends Fragment{
 
         TextView chosenLabel = view.findViewById(R.id.chosen_label);
 
-        if(chosenLabelId != null) {
+        if(chosenLabelId != -1L) {
             Uri labelUri = ContentUris.withAppendedId(ToduleDBContract.TodoLabel.CONTENT_ID_URI_BASE, chosenLabelId);
             Cursor cr = getContext().getContentResolver().query(labelUri, ToduleDBContract.TodoLabel.PROJECTION_ALL, null, null, ToduleDBContract.TodoLabel.SORT_ORDER_DEFAULT);
 
@@ -186,7 +194,7 @@ public class ToduleAddFragment extends Fragment{
             chosenLabel.setBackgroundColor(color);
             cr.close();
         } else {
-            chosenLabel.setText(R.string.no_label);
+            chosenLabel.setText(R.string.no_label_selected);
         }
 
         return view;
@@ -195,15 +203,13 @@ public class ToduleAddFragment extends Fragment{
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (chosenLabelId != null) {
-            outState.putLong("chosen_label_id", chosenLabelId);
-        }
+        outState.putLong("chosen_label_id", chosenLabelId);
+        outState.putSerializable("calendar", myCalendar);
     }
-
 
     @Override
     public void onDestroy() {
-        chosenLabelId = null;
+        chosenLabelId = -1L;
         super.onDestroy();
     }
 
@@ -245,7 +251,7 @@ public class ToduleAddFragment extends Fragment{
         cv.put(TodoEntry.COLUMN_NAME_DESCRIPTION, description_text);
         cv.put(TodoEntry.COLUMN_NAME_DUE_DATE, due_date);
         cv.put(TodoEntry.COLUMN_NAME_CREATED_DATE, created_date);
-        if(chosenLabelId == null){
+        if(chosenLabelId == -1L){
             cv.putNull(TodoEntry.COLUMN_NAME_LABEL);
         } else {
             cv.put(TodoEntry.COLUMN_NAME_LABEL, chosenLabelId);
@@ -280,7 +286,7 @@ public class ToduleAddFragment extends Fragment{
 
     public void setLabel(long id){
         if( id < 0){
-            chosenLabelId = null;
+            chosenLabelId = -1L;
         } else {
             chosenLabelId = id;
         }

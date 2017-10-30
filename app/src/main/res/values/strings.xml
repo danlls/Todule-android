@@ -23,8 +23,9 @@
     <string name="clear_history_dialog_negative">Cancel</string>
     <string name="label_setting">Labels</string>
     <string name="label_preview">Preview: </string>
-    <string name="no_label">&lt; No label selected &gt;</string>
+    <string name="no_label_selected">&lt; No label selected &gt;</string>
     <string name="text_label">Label:</string>
     <string name="select_action">Select</string>
     <string name="todule_label_add_page_title">New label</string>
+    <string name="none">None</string>
 </resources>

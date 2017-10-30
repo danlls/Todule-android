@@ -10,6 +10,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,6 +38,21 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
     Long selectedLabelId = null;
     boolean selecting;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            selecting = bundle.getBoolean("select", false);
+            selectedLabelId = bundle.getLong("selected_label_id", -1L);
+        } else {
+            selecting = false;
+        }
+        if(savedInstanceState != null) {
+            selectedLabelId = savedInstanceState.getLong("selected_label_id", -1L);
+        }
+    }
 
     @Nullable
     @Override
@@ -48,13 +64,6 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Bundle bundle = this.getArguments();
-        if (bundle != null) {
-            selecting = bundle.getBoolean("select");
-            selectedLabelId = bundle.getLong("selected_label_id", 0);
-        } else {
-            selecting = false;
-        }
 
         myActivity = (MainActivity) getActivity();
         myActivity.hideSoftKeyboard(true);
@@ -68,11 +77,8 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
             // Add "no label" to list
             View noLabel =  View.inflate(getContext(), R.layout.fragment_label_item, null);
             TextView labelTag = noLabel.findViewById(R.id.label_tag);
-            labelTag.setText("No label");
+            labelTag.setText(R.string.none);
             getListView().addHeaderView(noLabel);
-            if(savedInstanceState != null){
-                selectedLabelId = savedInstanceState.getLong("selected_label_id");
-            }
         }
         getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
@@ -80,8 +86,13 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onStart() {
         super.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         if(selecting) {
-            if (selectedLabelId == 0){
+            if (selectedLabelId == -1L){
                 // Set headerview as checked
                 getListView().setItemChecked(0, true);
             } else {
@@ -99,16 +110,9 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(selectedLabelId != null){
-            outState.putLong("selected_label_id", selectedLabelId);
-        }
+        outState.putLong("selected_label_id", selectedLabelId);
     }
 
-    @Override
-    public void onDestroyView() {
-        selectedLabelId = null;
-        super.onDestroyView();
-    }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
@@ -177,7 +181,7 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if(i == 0){
                     // If user choose the headerview "no label"
-                    mCallback.onLabelSelected(-1);
+                    selectedLabelId = -1L;
                 } else {
                     Cursor cr = (Cursor) adapterView.getItemAtPosition(i);
                     selectedLabelId = cr.getLong(cr.getColumnIndexOrThrow(TodoLabel._ID));
