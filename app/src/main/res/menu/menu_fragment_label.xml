@@ -5,5 +5,10 @@
         android:id="@+id/label_new"
         android:title="@string/todule_label_add_page_title"
         android:icon="@drawable/ic_add_white_24dp"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="collapseActionView"/>
+    <item
+        android:id="@+id/label_confirm"
+        android:title="@string/select_action"
+        android:icon="@drawable/ic_done_white_24dp"
+        app:showAsAction="always"/>
 </menu>

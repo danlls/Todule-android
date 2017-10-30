@@ -115,6 +115,8 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
         super.onPrepareOptionsMenu(menu);
         if(selecting) {
             menu.findItem(R.id.label_new).setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+        } else {
+            menu.findItem(R.id.label_confirm).setVisible(false);
         }
     }
 
@@ -157,6 +159,10 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
                         .addToBackStack(null)
                         .commit();
                 return true;
+            case R.id.label_confirm:
+                mCallback.onLabelSelected(selectedLabelId);
+                myActivity.onBackPressed();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -175,7 +181,6 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
                 } else {
                     Cursor cr = (Cursor) adapterView.getItemAtPosition(i);
                     selectedLabelId = cr.getLong(cr.getColumnIndexOrThrow(TodoLabel._ID));
-                    mCallback.onLabelSelected(selectedLabelId);
                 }
             }
         });
