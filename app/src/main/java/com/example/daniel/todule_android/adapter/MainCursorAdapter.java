@@ -117,6 +117,7 @@ public class MainCursorAdapter extends CursorAdapter {
                         view.getContext().getContentResolver().update(aUri, cv, null, null);
                     }
                 });
+                mySnackbar.show();
             }
         });
 

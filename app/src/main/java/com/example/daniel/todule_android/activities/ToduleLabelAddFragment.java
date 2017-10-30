@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.provider.ToduleDBContract;
@@ -130,6 +131,7 @@ public class ToduleLabelAddFragment extends Fragment {
                 cv.put(ToduleDBContract.TodoLabel.COLUMN_NAME_COLOR, cpView.getSelectedColor());
                 cv.put(ToduleDBContract.TodoLabel.COLUMN_NAME_TEXT_COLOR, preview_text.getCurrentTextColor());
                 Uri itemUri = getContext().getContentResolver().insert(ToduleDBContract.TodoLabel.CONTENT_URI, cv);
+                Toast.makeText(getContext(), "Label '" + preview_text.getText().toString() + "' created", Toast.LENGTH_SHORT).show();
                 getActivity().onBackPressed();
                 return true;
         }

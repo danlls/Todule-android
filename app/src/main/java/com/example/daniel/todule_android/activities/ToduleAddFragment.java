@@ -43,11 +43,13 @@ public class ToduleAddFragment extends Fragment{
     Calendar myCalendar;
     MainActivity myActivity;
     Long chosenLabelId = -1L;
+    boolean userModified;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        userModified = false;
         if(savedInstanceState != null){
             myCalendar = (Calendar) savedInstanceState.getSerializable("calendar");
             chosenLabelId = savedInstanceState.getLong("chosen_label_id", -1L);
@@ -205,12 +207,6 @@ public class ToduleAddFragment extends Fragment{
         super.onSaveInstanceState(outState);
         outState.putLong("chosen_label_id", chosenLabelId);
         outState.putSerializable("calendar", myCalendar);
-    }
-
-    @Override
-    public void onDestroy() {
-        chosenLabelId = -1L;
-        super.onDestroy();
     }
 
     @Override
