@@ -50,6 +50,10 @@ public class ToduleAddFragment extends Fragment{
         myActivity.getSupportActionBar().setTitle("New entry");
         setHasOptionsMenu(true);
 
+        if(savedInstanceState != null){
+            chosenLabelId = savedInstanceState.getLong("chosen_label_id");
+        }
+
         EditText titleEdit = view.findViewById(R.id.edit_title);
         final EditText dateEdit = view.findViewById(R.id.edit_date);
         final EditText timeEdit = view.findViewById(R.id.edit_time);
@@ -187,6 +191,15 @@ public class ToduleAddFragment extends Fragment{
 
         return view;
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (chosenLabelId != null) {
+            outState.putLong("chosen_label_id", chosenLabelId);
+        }
+    }
+
 
     @Override
     public void onDestroy() {

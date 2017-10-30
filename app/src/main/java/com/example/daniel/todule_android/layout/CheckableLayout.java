@@ -36,7 +36,6 @@ public class CheckableLayout extends LinearLayout implements Checkable {
     @Override
     public void setChecked(boolean b) {
         mChecked = b;
-        Log.i("label_chceked>", b?"true" : "false");
         setBackground(b ? new ColorDrawable(android.graphics.Color.LTGRAY) : null);
     }
 

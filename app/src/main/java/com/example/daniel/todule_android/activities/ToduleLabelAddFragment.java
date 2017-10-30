@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -32,6 +33,7 @@ public class ToduleLabelAddFragment extends Fragment {
     ColorPickerView cpView;
     TextView preview_text;
     EditText tag_edit;
+    Integer selected_color;
 
     @Nullable
     @Override
@@ -41,6 +43,9 @@ public class ToduleLabelAddFragment extends Fragment {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_label_add, container, false);
 
+        if (savedInstanceState != null){
+            selected_color = savedInstanceState.getInt("selected_color");
+        }
         tag_edit = view.findViewById(R.id.tag_edit);
         preview_text = view.findViewById(R.id.preview_label);
 
@@ -61,12 +66,21 @@ public class ToduleLabelAddFragment extends Fragment {
 
 
         cpView = view.findViewById(R.id.color_picker_view);
+
+        if(selected_color == null){
+            // Set default
+            selected_color = ContextCompat.getColor(getContext(), R.color.normalGreen);
+        }
+        cpView.setColor(selected_color, false);
+        preview_text.setBackgroundColor(selected_color);
+
         cpView.addOnColorChangedListener(new OnColorChangedListener() {
             @Override
             public void onColorChanged(int i) {
                 tag_edit.clearFocus();
                 myActivity.hideSoftKeyboard(true);
-                preview_text.setBackgroundColor(i);
+                selected_color = i;
+                preview_text.setBackgroundColor(selected_color);
                 Bitmap image = Bitmap.createBitmap(5, 5, Bitmap.Config.ARGB_8888);
                 image.eraseColor(i);
                 Palette.from(image).generate(new Palette.PaletteAsyncListener() {
@@ -90,6 +104,14 @@ public class ToduleLabelAddFragment extends Fragment {
             }
         }, 200);
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(selected_color != null) {
+            outState.putInt("selected_color", selected_color);
+        }
     }
 
     @Override
