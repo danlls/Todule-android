@@ -3,7 +3,8 @@
      android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:clipToPadding="false">
+    android:clipToPadding="false"
+    android:descendantFocusability="blocksDescendants">
 
     <TextView android:id="@+id/title_text"
         android:textSize="20sp"
@@ -68,7 +69,8 @@
             android:text="@string/archive"
             android:elevation="2dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="3dp"/>
+            android:layout_marginBottom="3dp"
+            style="?android:attr/buttonBarButtonStyle"/>
 
         <Button
             android:layout_width="wrap_content"
@@ -78,7 +80,8 @@
             android:textColor="@color/white"
             android:background="@drawable/done_raised_bg"
             android:text="@string/mark_done"
-            android:elevation="2dp" />
+            android:elevation="2dp"
+            style="?android:attr/buttonBarButtonStyle"/>
 
     </LinearLayout>
 
