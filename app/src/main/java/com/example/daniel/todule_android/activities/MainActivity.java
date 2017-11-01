@@ -69,8 +69,12 @@ public class MainActivity extends AppCompatActivity implements ToduleLabelFragme
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {;
+                ToduleAddFragment frag = new ToduleAddFragment();
+                Bundle args = new Bundle();
+                args.putString("mode", "create_entry");
+                frag.setArguments(args);
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container, new ToduleAddFragment(), "add_frag");
+                ft.replace(R.id.fragment_container, frag, "add_frag");
                 ft.addToBackStack(null);
                 ft.commit();
             }

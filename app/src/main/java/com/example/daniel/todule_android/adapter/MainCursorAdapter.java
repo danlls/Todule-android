@@ -56,6 +56,7 @@ public class MainCursorAdapter extends CursorAdapter {
             holder.label.setText(labelText);
             holder.label.setTextColor(textColor);
             holder.label.setBackgroundColor(color);
+            holder.label.setVisibility(View.VISIBLE);
             cr.close();
         } else {
             holder.label.setVisibility(View.GONE);
@@ -121,18 +122,18 @@ public class MainCursorAdapter extends CursorAdapter {
             }
         });
 
-        view.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                if(holder.description.getMaxLines() == 1) {
-                    holder.description.setMaxLines(Integer.MAX_VALUE);
-                    holder.description.setEllipsize(null);
-                } else {
-                    holder.description.setMaxLines(1);
-                    holder.description.setEllipsize(TextUtils.TruncateAt.END);
-                }
-            }
-        });
+//        view.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View view) {
+//                if(holder.description.getMaxLines() == 1) {
+//                    holder.description.setMaxLines(Integer.MAX_VALUE);
+//                    holder.description.setEllipsize(null);
+//                } else {
+//                    holder.description.setMaxLines(1);
+//                    holder.description.setEllipsize(TextUtils.TruncateAt.END);
+//                }
+//            }
+//        });
 
     }
 

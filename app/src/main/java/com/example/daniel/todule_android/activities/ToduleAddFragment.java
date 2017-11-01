@@ -43,36 +43,76 @@ public class ToduleAddFragment extends Fragment{
     Calendar myCalendar;
     MainActivity myActivity;
     Long chosenLabelId = -1L;
-    boolean userModified;
+    String mode;
+    Long entryId;
+    String title;
+    String description;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        userModified = false;
+        Bundle bundle = this.getArguments();
+        if(bundle != null){
+            mode = bundle.getString("mode");
+            if(bundle.containsKey("entry_id")){
+                entryId = bundle.getLong("entry_id");
+            } else {
+                entryId = null;
+            }
+        }
+
         if(savedInstanceState != null){
             myCalendar = (Calendar) savedInstanceState.getSerializable("calendar");
             chosenLabelId = savedInstanceState.getLong("chosen_label_id", -1L);
+            title = savedInstanceState.getString("title");
         } else {
-            // Set default
             myCalendar = Calendar.getInstance();
+            // Default for new entry
             myCalendar.set(Calendar.HOUR_OF_DAY, 23);
             myCalendar.set(Calendar.MINUTE, 59);
             myCalendar.set(Calendar.SECOND, 0);
+
+            if (mode.equals("edit_entry")){
+                Uri entryUri = ContentUris.withAppendedId(ToduleDBContract.TodoEntry.CONTENT_ID_URI_BASE, entryId);
+                Cursor cr = getContext().getContentResolver().query(entryUri, TodoEntry.PROJECTION_ALL, null, null, TodoEntry.SORT_ORDER_DEFAULT);
+                cr.moveToFirst();
+
+                long dueDateInMillis = cr.getLong(cr.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_DUE_DATE));
+                title = cr.getString(cr.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_TITLE));
+                description = cr.getString(cr.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_DESCRIPTION));
+                if(cr.isNull(cr.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_LABEL))){
+                    chosenLabelId = -1L;
+                } else{
+                    chosenLabelId = cr.getLong(cr.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_LABEL));
+                }
+
+                myCalendar.setTimeInMillis(dueDateInMillis);
+
+                cr.close();
+            }
         }
     }
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         myActivity = (MainActivity) getActivity();
-        View view = inflater.inflate(R.layout.fragment_add, container, false);
-        myActivity.getSupportActionBar().setTitle("New entry");
         setHasOptionsMenu(true);
+        if(mode.equals("edit_entry")){
+            myActivity.getSupportActionBar().setTitle(title);
+        } else {
+            myActivity.getSupportActionBar().setTitle("New entry");
+        }
+        View view = inflater.inflate(R.layout.fragment_add, container, false);
 
         EditText titleEdit = view.findViewById(R.id.edit_title);
+        EditText descriptionEdit = view.findViewById(R.id.edit_description);
         final EditText dateEdit = view.findViewById(R.id.edit_date);
         final EditText timeEdit = view.findViewById(R.id.edit_time);
         dateEdit.setInputType(InputType.TYPE_NULL);
         timeEdit.setInputType(InputType.TYPE_NULL);
+
+        titleEdit.setText(title);
+        descriptionEdit.setText(description);
 
         dateEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -128,26 +168,6 @@ public class ToduleAddFragment extends Fragment{
             }
         });
 
-        timeEdit.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                long date_time = myCalendar.getTimeInMillis();
-                long current_date_time = System.currentTimeMillis();
-                if (date_time < current_date_time){
-                    timeEdit.setError("Please select a time later than now");
-                } else {
-                    timeEdit.setError(null);
-                }
-            }
-        });
 
         DateFormat df = DateFormat.getDateInstance();
         dateEdit.setText(df.format(myCalendar.getTime()));
@@ -181,8 +201,8 @@ public class ToduleAddFragment extends Fragment{
             }
         });
 
-        TextView chosenLabel = view.findViewById(R.id.chosen_label);
 
+        TextView chosenLabel = view.findViewById(R.id.chosen_label);
         if(chosenLabelId != -1L) {
             Uri labelUri = ContentUris.withAppendedId(ToduleDBContract.TodoLabel.CONTENT_ID_URI_BASE, chosenLabelId);
             Cursor cr = getContext().getContentResolver().query(labelUri, ToduleDBContract.TodoLabel.PROJECTION_ALL, null, null, ToduleDBContract.TodoLabel.SORT_ORDER_DEFAULT);
@@ -199,6 +219,8 @@ public class ToduleAddFragment extends Fragment{
             chosenLabel.setText(R.string.no_label_selected);
         }
 
+
+
         return view;
     }
 
@@ -207,6 +229,7 @@ public class ToduleAddFragment extends Fragment{
         super.onSaveInstanceState(outState);
         outState.putLong("chosen_label_id", chosenLabelId);
         outState.putSerializable("calendar", myCalendar);
+        outState.putString("title", title);
     }
 
     @Override
@@ -221,8 +244,7 @@ public class ToduleAddFragment extends Fragment{
         switch(item.getItemId()) {
             case R.id.action_save:
                 if (validateInputs()){
-                    addEntry();
-                    Toast.makeText(myActivity, R.string.entry_created, Toast.LENGTH_SHORT).show();
+                    updateEntry();
                     getActivity().onBackPressed();
                 }
                 break;
@@ -232,7 +254,7 @@ public class ToduleAddFragment extends Fragment{
         return true;
     }
 
-    private void addEntry(){
+    private void updateEntry(){
         EditText title = (EditText) getView().findViewById(R.id.edit_title);
         String title_text = title.getText().toString();
 
@@ -252,18 +274,25 @@ public class ToduleAddFragment extends Fragment{
         } else {
             cv.put(TodoEntry.COLUMN_NAME_LABEL, chosenLabelId);
         }
-        Uri itemUri = getContext().getContentResolver().insert(TodoEntry.CONTENT_URI, cv);
+
+        Uri entryUri;
+        if(entryId == null) {
+            entryUri = getContext().getContentResolver().insert(TodoEntry.CONTENT_URI, cv);
+            Toast.makeText(myActivity, R.string.entry_created, Toast.LENGTH_SHORT).show();
+        } else {
+            entryUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, entryId);
+            getContext().getContentResolver().update(entryUri, cv, null, null);
+            Toast.makeText(myActivity, R.string.entry_updated, Toast.LENGTH_SHORT).show();
+        }
         // Reminder set at one minute before due_date
-        myActivity.setReminder(itemUri, due_date - 60 * 60 * 1000);
+        myActivity.setReminder(entryUri, due_date - 60 * 60 * 1000);
     }
 
     private boolean validateInputs() {
-        boolean valid;
+        boolean valid = true;
         // Validates title (required field, ensure title is given.)
         EditText title = (EditText) getView().findViewById(R.id.edit_title);
-        if (!title.getText().toString().isEmpty()) {
-            valid = true;
-        } else {
+        if (title.getText().toString().isEmpty()) {
             title.setError("This field is required.");
             title.requestFocus();
             myActivity.hideSoftKeyboard(false);
@@ -272,9 +301,14 @@ public class ToduleAddFragment extends Fragment{
 
         // Validates due_date (must be later than now.)
         EditText time = (EditText) getView().findViewById(R.id.edit_time);
-        if (time.getError() != null){
+        long date_time = myCalendar.getTimeInMillis();
+        long current_date_time = System.currentTimeMillis();
+        if (date_time < current_date_time){
+            time.setError("Please select a time later than now");
             time.requestFocus();
             valid = false;
+        } else {
+            time.setError(null);
         }
 
         return valid;
