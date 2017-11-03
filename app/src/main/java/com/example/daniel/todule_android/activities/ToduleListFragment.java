@@ -61,13 +61,9 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        ToduleAddFragment frag = new ToduleAddFragment();
-        Bundle args = new Bundle();
-        args.putString("mode", "edit_entry");
-        args.putLong("entry_id", id);
-        frag.setArguments(args);
+        ToduleDetailFragment frag = ToduleDetailFragment.newInstance(id);
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, frag, "add_frag")
+                .replace(R.id.fragment_container, frag, "detail_frag")
                 .addToBackStack(null)
                 .commit();
     }
