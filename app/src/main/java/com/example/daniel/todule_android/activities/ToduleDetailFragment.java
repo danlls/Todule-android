@@ -1,12 +1,17 @@
 package com.example.daniel.todule_android.activities;
 
 import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,7 +19,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.provider.ToduleDBContract;
@@ -57,6 +64,7 @@ public class ToduleDetailFragment extends Fragment {
         TextView createdDateView = view.findViewById(R.id.detail_created_date);
         TextView dueDateView = view.findViewById(R.id.detail_due_date);
         TextView countdownView = view.findViewById(R.id.detail_countdown);
+        Button doneButton = view.findViewById(R.id.detail_done);
 
         Uri entryUri = ContentUris.withAppendedId(ToduleDBContract.TodoEntry.CONTENT_ID_URI_BASE, entryId);
         Cursor cr = getContext().getContentResolver().query(entryUri, ToduleDBContract.TodoEntry.PROJECTION_ALL, null, null, null);
@@ -113,6 +121,27 @@ public class ToduleDetailFragment extends Fragment {
             labelView.setVisibility(View.GONE);
         }
 
+        doneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Uri entryUri = ContentUris.withAppendedId(ToduleDBContract.TodoEntry.CONTENT_ID_URI_BASE, entryId);
+                ContentValues cv = new ContentValues();
+                cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_TASK_DONE, ToduleDBContract.TodoEntry.TASK_COMPLETED);
+                getContext().getContentResolver().update(entryUri, cv, null, null);
+                Snackbar mySnackbar = Snackbar.make(view, R.string.entry_done, Snackbar.LENGTH_LONG);
+                mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ContentValues cv = new ContentValues();
+                        cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_TASK_DONE, ToduleDBContract.TodoEntry.TASK_NOT_COMPLETED);
+                        view.getContext().getContentResolver().update(entryUri, cv, null, null);
+                    }
+                });
+                mySnackbar.show();
+                myActivity.onBackPressed();
+            }
+        });
+
         myActivity.getSupportActionBar().setTitle(title);
         return view;
     }
@@ -137,6 +166,42 @@ public class ToduleDetailFragment extends Fragment {
                         .replace(R.id.fragment_container, frag, "add_frag")
                         .addToBackStack(null)
                         .commit();
+                return true;
+            case R.id.action_delete:
+                AlertDialog.Builder builder;
+                builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Delete entry")
+                        .setMessage("Are you sure you want to delete this entry?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Uri entryUri = ContentUris.withAppendedId(ToduleDBContract.TodoEntry.CONTENT_ID_URI_BASE, entryId);
+                                getContext().getContentResolver().delete(entryUri, null, null);
+                                Toast.makeText(getContext(), "Entry deleted", Toast.LENGTH_SHORT).show();
+                                myActivity.onBackPressed();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .show();
+                return true;
+            case R.id.action_archive:
+                final Uri entryUri = ContentUris.withAppendedId(ToduleDBContract.TodoEntry.CONTENT_ID_URI_BASE, entryId);
+                final ContentValues cv = new ContentValues();
+                cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_ARCHIVED, 1);
+                getContext().getContentResolver().update(entryUri, cv, null, null);
+                Snackbar mySnackbar = Snackbar.make(getView(), R.string.entry_archived, Snackbar.LENGTH_LONG);
+                mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_ARCHIVED, 0);
+                        view.getContext().getContentResolver().update(entryUri, cv, null, null);
+                    }
+                });
+                mySnackbar.show();
+                myActivity.onBackPressed();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
