@@ -52,24 +52,24 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
         if(savedInstanceState != null) {
             selectedLabelId = savedInstanceState.getLong("selected_label_id", -1L);
         }
+        myActivity = (MainActivity) getActivity();
+        myActivity.getSupportActionBar().setTitle("Labels");
+        myActivity.hideSoftKeyboard(true);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
+
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        myActivity = (MainActivity) getActivity();
-        myActivity.hideSoftKeyboard(true);
-        myActivity.getSupportActionBar().setTitle("Labels");
         lAdapter = new LabelAdapter(getActivity(), null, 0);
         setListAdapter(lAdapter);
+        getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
         if(selecting){
             setActivateOnItemClick(true);
@@ -80,31 +80,13 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
             labelTag.setText(R.string.none);
             getListView().addHeaderView(noLabel);
         }
-        getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if(selecting) {
-            if (selectedLabelId == -1L){
-                // Set headerview as checked
-                getListView().setItemChecked(0, true);
-            } else {
-                getListView().setItemChecked(getAdapterItemPosition(selectedLabelId) + getListView().getHeaderViewsCount(), true);
-            }
-        }
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
         view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -138,6 +120,21 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
         // Swap the new cursor in.  (The framework will take care of closing the
         // old cursor once we return.)
         lAdapter.swapCursor(data);
+        getListView().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ListView lv = getListView();
+                if(selecting) {
+                    if (selectedLabelId == -1L){
+                        // Set headerview as checked
+                        lv.setItemChecked(0, true);
+                    } else {
+                        lv.setItemChecked(getAdapterItemPosition(selectedLabelId) + lv.getHeaderViewsCount(), true);
+                    }
+                }
+            }
+        }, 100);
+
     }
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
