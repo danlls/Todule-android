@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements ToduleLabelFragme
                 args.putString("mode", "create_entry");
                 frag.setArguments(args);
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top, R.anim.enter_from_top, R.anim.exit_to_bottom);
                 ft.replace(R.id.fragment_container, frag, "add_frag");
                 ft.addToBackStack(null);
                 ft.commit();

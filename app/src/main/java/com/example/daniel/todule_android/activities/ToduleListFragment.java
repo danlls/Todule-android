@@ -3,21 +3,31 @@ package com.example.daniel.todule_android.activities;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.transition.Fade;
+import android.support.transition.TransitionInflater;
+import android.support.transition.TransitionSet;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.ListView;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.adapter.MainCursorAdapter;
@@ -63,6 +73,7 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
         super.onListItemClick(l, v, position, id);
         ToduleDetailFragment frag = ToduleDetailFragment.newInstance(id);
         getActivity().getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
                 .replace(R.id.fragment_container, frag, "detail_frag")
                 .addToBackStack(null)
                 .commit();
@@ -118,9 +129,10 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
         switch(item.getItemId()) {
             case R.id.label_setting:
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new ToduleLabelFragment())
-                        .addToBackStack(null)
-                        .commit();
+                    .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top, R.anim.enter_from_top, R.anim.exit_to_bottom)
+                    .replace(R.id.fragment_container, new ToduleLabelFragment())
+                    .addToBackStack(null)
+                    .commit();
                 return true;
         }
         return super.onOptionsItemSelected(item);

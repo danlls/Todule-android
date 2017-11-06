@@ -31,4 +31,5 @@
     <string name="none">None</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="detail_fragment_transition"/>
 </resources>
