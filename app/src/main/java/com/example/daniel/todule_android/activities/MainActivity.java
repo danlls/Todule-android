@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -90,15 +91,21 @@ public class MainActivity extends AppCompatActivity implements ToduleLabelFragme
             }
         });
 
-        // Check if activity is launched from notification intent
-        long entryId = getIntent().getLongExtra("todule_id", -1L);
+        // Check if activity is launched with todule_id (From notification)
+        final long entryId = getIntent().getLongExtra("todule_id", -1L);
         if(entryId != -1L){
-            ToduleDetailFragment frag = ToduleDetailFragment.newInstance(entryId);
-            getSupportFragmentManager().beginTransaction()
-                    .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
-                    .replace(R.id.fragment_container, frag)
-                    .addToBackStack(null)
-                    .commit();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ToduleDetailFragment frag = ToduleDetailFragment.newInstance(entryId);
+                    getSupportFragmentManager().beginTransaction()
+                            .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                            .replace(R.id.fragment_container, frag)
+                            .addToBackStack(null)
+                            .commit();
+                }
+            }, 500);
+
         }
     }
 
