@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -88,6 +89,17 @@ public class MainActivity extends AppCompatActivity implements ToduleLabelFragme
                 updateFragmentPresentation();
             }
         });
+
+        // Check if activity is launched from notification intent
+        long entryId = getIntent().getLongExtra("todule_id", -1L);
+        if(entryId != -1L){
+            ToduleDetailFragment frag = ToduleDetailFragment.newInstance(entryId);
+            getSupportFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                    .replace(R.id.fragment_container, frag)
+                    .addToBackStack(null)
+                    .commit();
+        }
     }
 
     private void updateFragmentPresentation(){
@@ -192,6 +204,7 @@ public class MainActivity extends AppCompatActivity implements ToduleLabelFragme
 
         Intent intent = new Intent(context, NotificationReceiver.class);
         intent.setData(Uri.parse(R.string.reminder_intent_scheme + String.valueOf(itemId)));
+        intent.putExtra("todule_id", itemId);
         intent.putExtra("todule_title", title);
         intent.putExtra("todule_due_date", dueDateString);
         PendingIntent sender = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
