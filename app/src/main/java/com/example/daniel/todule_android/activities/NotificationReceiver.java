@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.example.daniel.todule_android.R;
 
@@ -20,10 +21,15 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class NotificationReceiver extends BroadcastReceiver {
 
+    String CHANNEL_ID = "todule_channel";
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
+        long entryId = intent.getLongExtra("todule_id", -1L);
+
         Intent notificationIntent = new Intent(context, MainActivity.class);
+        notificationIntent.putExtra("todule_id", entryId);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         PendingIntent resultPendingIntent =
@@ -31,11 +37,11 @@ public class NotificationReceiver extends BroadcastReceiver {
                         context,
                         0,
                         notificationIntent,
-                        0
+                        PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
+                new NotificationCompat.Builder(context, CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_stat_todule)
                         .setContentTitle("Reminder: " + intent.getStringExtra("todule_title"))
                         .setContentText(intent.getStringExtra("todule_due_date"))
