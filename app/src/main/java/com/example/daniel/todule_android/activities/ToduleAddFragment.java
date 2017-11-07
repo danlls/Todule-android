@@ -285,7 +285,7 @@ public class ToduleAddFragment extends Fragment{
             getContext().getContentResolver().update(entryUri, cv, null, null);
             Toast.makeText(myActivity, R.string.entry_updated, Toast.LENGTH_SHORT).show();
         }
-        // Reminder set at one minute before due_date
+        // Reminder set at one hour before due_date
         myActivity.setReminder(entryUri, due_date - 60 * 60 * 1000);
     }
 

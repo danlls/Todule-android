@@ -177,6 +177,7 @@ public class ToduleDetailFragment extends Fragment {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Uri entryUri = ContentUris.withAppendedId(ToduleDBContract.TodoEntry.CONTENT_ID_URI_BASE, entryId);
+                                myActivity.cancelReminder(entryUri);
                                 getContext().getContentResolver().delete(entryUri, null, null);
                                 Toast.makeText(getContext(), "Entry deleted", Toast.LENGTH_SHORT).show();
                                 myActivity.onBackPressed();

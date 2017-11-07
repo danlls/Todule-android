@@ -200,8 +200,7 @@ public class MainActivity extends AppCompatActivity implements ToduleLabelFragme
         }
     }
 
-    public void setReminder(Uri itemUri, long datetimeInMillis){
-
+    public PendingIntent initReminderPendingIntent(Uri itemUri){
         Cursor cr = getContentResolver().query(itemUri, ToduleDBContract.TodoEntry.PROJECTION_ALL, null, null, ToduleDBContract.TodoEntry.SORT_ORDER_DEFAULT);
         cr.moveToFirst();
         long itemId = Long.valueOf(itemUri.getLastPathSegment());
@@ -215,11 +214,20 @@ public class MainActivity extends AppCompatActivity implements ToduleLabelFragme
         intent.putExtra("todule_title", title);
         intent.putExtra("todule_due_date", dueDateString);
         PendingIntent sender = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-
-        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-        am.set(AlarmManager.RTC_WAKEUP, datetimeInMillis, sender);
-
         cr.close();
+        return sender;
+    }
+
+    public void setReminder(Uri itemUri, long datetimeInMillis){
+        PendingIntent pIntent = initReminderPendingIntent(itemUri);
+        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        am.set(AlarmManager.RTC_WAKEUP, datetimeInMillis, pIntent);
+    }
+
+    public void cancelReminder(Uri itemUri){
+        PendingIntent pIntent = initReminderPendingIntent(itemUri);
+        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        am.cancel(pIntent);
     }
 
     @Override

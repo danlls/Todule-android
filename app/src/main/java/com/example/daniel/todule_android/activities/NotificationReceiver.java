@@ -27,7 +27,6 @@ public class NotificationReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         long entryId = intent.getLongExtra("todule_id", -1L);
-
         Intent notificationIntent = new Intent(context, MainActivity.class);
         notificationIntent.putExtra("todule_id", entryId);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -51,19 +50,11 @@ public class NotificationReceiver extends BroadcastReceiver {
         mBuilder.setDefaults(Notification.DEFAULT_ALL);
 
         // Gets an instance of the NotificationManager service
-            NotificationManager mNotifyMgr =
-                        (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        NotificationManager mNotifyMgr =
+                (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+
         // Builds the notification and issues it.
-            mNotifyMgr.notify(getNextNotifId(context), mBuilder.build());
+        mNotifyMgr.notify((int) entryId, mBuilder.build());
     }
 
-    private static final String PREFERENCE_LAST_NOTIF_ID = "PREFERENCE_LAST_NOTIF_ID";
-
-    private static int getNextNotifId(Context context) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int id = sharedPreferences.getInt(PREFERENCE_LAST_NOTIF_ID, 0) + 1;
-        if (id == Integer.MAX_VALUE) { id = 0; }
-        sharedPreferences.edit().putInt(PREFERENCE_LAST_NOTIF_ID, id).apply();
-        return id;
-    }
 }
