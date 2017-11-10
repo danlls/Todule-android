@@ -36,6 +36,7 @@ import com.example.daniel.todule_android.utilities.DateTimeUtils;
 public class ToduleDetailFragment extends Fragment {
     MainActivity myActivity;
     private Long entryId;
+    String title;
 
     public static ToduleDetailFragment newInstance(long id) {
         ToduleDetailFragment f= new ToduleDetailFragment();
@@ -70,7 +71,7 @@ public class ToduleDetailFragment extends Fragment {
         Uri entryUri = ContentUris.withAppendedId(ToduleDBContract.TodoEntry.CONTENT_ID_URI_BASE, entryId);
         Cursor cr = getContext().getContentResolver().query(entryUri, ToduleDBContract.TodoEntry.PROJECTION_ALL, null, null, null);
         cr.moveToFirst();
-        String title = cr.getString(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_TITLE));
+        title = cr.getString(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_TITLE));
         String description = cr.getString(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_DESCRIPTION));
         Long dueDate = cr.getLong(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_DUE_DATE));
         Long createdDate = cr.getLong(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_CREATED_DATE));
@@ -179,7 +180,7 @@ public class ToduleDetailFragment extends Fragment {
                                 Uri entryUri = ContentUris.withAppendedId(ToduleDBContract.TodoEntry.CONTENT_ID_URI_BASE, entryId);
                                 myActivity.cancelReminder(entryUri);
                                 getContext().getContentResolver().delete(entryUri, null, null);
-                                Toast.makeText(getContext(), "Entry deleted", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), getString(R.string.entry_deleted) + ": " + title, Toast.LENGTH_SHORT).show();
                                 myActivity.onBackPressed();
                             }
                         })
@@ -194,7 +195,7 @@ public class ToduleDetailFragment extends Fragment {
                 final ContentValues cv = new ContentValues();
                 cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_ARCHIVED, 1);
                 getContext().getContentResolver().update(entryUri, cv, null, null);
-                Snackbar mySnackbar = Snackbar.make(getView(), R.string.entry_archived, Snackbar.LENGTH_LONG);
+                Snackbar mySnackbar = Snackbar.make(getView(), getString(R.string.entry_archived) + ": " + title, Snackbar.LENGTH_LONG);
                 mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

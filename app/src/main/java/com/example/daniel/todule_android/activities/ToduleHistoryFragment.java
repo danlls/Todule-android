@@ -13,6 +13,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.adapter.HistoryAdapter;
@@ -82,7 +83,10 @@ public class ToduleHistoryFragment extends ListFragment implements LoaderManager
                         // User clicked OK button
                         String selectionClause = TodoEntry.COLUMN_NAME_ARCHIVED + " = ?";
                         String[] selectionArgs = {"1"};
-                        getContext().getContentResolver().delete(TodoEntry.CONTENT_URI, selectionClause, selectionArgs);
+                        int count = getContext().getContentResolver().delete(TodoEntry.CONTENT_URI, selectionClause, selectionArgs);
+                        if (count > 0){
+                            Toast.makeText(getContext(), String.valueOf(count) + " " + getString(R.string.entry_deleted), Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
                 builder.setNegativeButton(R.string.clear_history_dialog_negative, new DialogInterface.OnClickListener() {

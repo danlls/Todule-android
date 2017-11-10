@@ -279,11 +279,11 @@ public class ToduleAddFragment extends Fragment{
         Uri entryUri;
         if(entryId == null) {
             entryUri = getContext().getContentResolver().insert(TodoEntry.CONTENT_URI, cv);
-            Toast.makeText(myActivity, R.string.entry_created, Toast.LENGTH_SHORT).show();
+            Toast.makeText(myActivity, getString(R.string.entry_created) + ": " + title_text, Toast.LENGTH_SHORT).show();
         } else {
             entryUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, entryId);
             getContext().getContentResolver().update(entryUri, cv, null, null);
-            Toast.makeText(myActivity, R.string.entry_updated, Toast.LENGTH_SHORT).show();
+            Toast.makeText(myActivity, getString(R.string.entry_updated) + ": " + title_text, Toast.LENGTH_SHORT).show();
         }
         // Reminder set at one hour before due_date
         myActivity.setReminder(entryUri, due_date - 60 * 60 * 1000);

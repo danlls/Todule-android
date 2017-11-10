@@ -35,11 +35,11 @@ public class MainCursorAdapter extends CursorAdapter {
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(View view, final Context context, Cursor cursor) {
         final long id = cursor.getLong(cursor.getColumnIndexOrThrow(TodoEntry._ID));
         final ViewHolder holder = (ViewHolder) view.getTag();
 
-        String title = cursor.getString(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_TITLE));
+        final String title = cursor.getString(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_TITLE));
         String description = cursor.getString(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_DESCRIPTION));
         long dueDate = cursor.getLong(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_DUE_DATE));
         String dueDateString = DateUtils.formatDateTime(context, dueDate, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_TIME);
@@ -87,7 +87,7 @@ public class MainCursorAdapter extends CursorAdapter {
                 cv.put(TodoEntry.COLUMN_NAME_COMPLETED_DATE, System.currentTimeMillis());
                 Uri aUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
                 view.getContext().getContentResolver().update(aUri, cv, null, null);
-                Snackbar mySnackbar = Snackbar.make(view, R.string.entry_done, Snackbar.LENGTH_LONG);
+                Snackbar mySnackbar = Snackbar.make(view, context.getString(R.string.entry_done) + ": " + title, Snackbar.LENGTH_LONG);
                 mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -109,7 +109,7 @@ public class MainCursorAdapter extends CursorAdapter {
                 cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, 1);
                 Uri aUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
                 view.getContext().getContentResolver().update(aUri, cv, null, null);
-                Snackbar mySnackbar = Snackbar.make(view, R.string.entry_archived, Snackbar.LENGTH_LONG);
+                Snackbar mySnackbar = Snackbar.make(view, context.getString(R.string.entry_archived) + ": " + title, Snackbar.LENGTH_LONG);
                 mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -121,19 +121,6 @@ public class MainCursorAdapter extends CursorAdapter {
                 mySnackbar.show();
             }
         });
-
-//        view.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View view) {
-//                if(holder.description.getMaxLines() == 1) {
-//                    holder.description.setMaxLines(Integer.MAX_VALUE);
-//                    holder.description.setEllipsize(null);
-//                } else {
-//                    holder.description.setMaxLines(1);
-//                    holder.description.setEllipsize(TextUtils.TruncateAt.END);
-//                }
-//            }
-//        });
 
     }
 
