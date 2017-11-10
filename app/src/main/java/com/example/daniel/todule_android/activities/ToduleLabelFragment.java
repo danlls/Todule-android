@@ -92,7 +92,9 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong("selected_label_id", selectedLabelId);
+        if(selecting) {
+            outState.putLong("selected_label_id", selectedLabelId);
+        }
     }
 
 
