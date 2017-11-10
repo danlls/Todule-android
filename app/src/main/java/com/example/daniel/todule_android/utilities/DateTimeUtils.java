@@ -32,10 +32,13 @@ public final class DateTimeUtils {
             result += (diffInDays == 1) ? " day" : " days";
         } else if (diffInHours >= 1) {
             result = String.valueOf(diffInHours);
-            result += (diffInHours == 1) ? " hour" : " hours";
+            result += (diffInHours == 1) ? " hr " : " hrs ";
+            long minutes = diffInMinutes % 60;
+            result += String.valueOf(minutes);
+            result += (minutes == 1) ? " min" : " mins";
         } else if (diffInMinutes >= 1) {
             result = String.valueOf(diffInMinutes);
-            result += (diffInMinutes == 1) ? " minute" : " minutes";
+            result += (diffInMinutes == 1) ? " min" : " mins";
         } else {
             result = String.valueOf(diffInSeconds);
             result += (diffInSeconds == 1) ? " second" : " seconds";
