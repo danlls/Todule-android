@@ -5,7 +5,7 @@
         android:id="@+id/label_new"
         android:title="@string/todule_label_add_page_title"
         android:icon="@drawable/ic_add_white_24dp"
-        app:showAsAction="collapseActionView"/>
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/label_confirm"
         android:title="@string/select_action"

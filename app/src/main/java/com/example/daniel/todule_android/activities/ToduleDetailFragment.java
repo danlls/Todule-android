@@ -4,6 +4,8 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,6 +14,8 @@ import android.support.design.widget.Snackbar;
 import android.support.transition.TransitionInflater;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -75,6 +79,7 @@ public class ToduleDetailFragment extends Fragment {
         String description = cr.getString(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_DESCRIPTION));
         Long dueDate = cr.getLong(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_DUE_DATE));
         Long createdDate = cr.getLong(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_CREATED_DATE));
+        Long completeDate = cr.getLong(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_COMPLETED_DATE));
         Long labelId;
         if(cr.isNull(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_LABEL))){
             labelId = null;
@@ -94,16 +99,35 @@ public class ToduleDetailFragment extends Fragment {
         String createDateString = DateUtils.formatDateTime(getContext(), createdDate, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_TIME);
         String dueDateString = DateUtils.formatDateTime(getContext(), dueDate, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_TIME);
         String countdownString =  DateTimeUtils.dateTimeDiff(dueDate);
+        String completeDateString = DateTimeUtils.dateTimeDiff(completeDate);
 
-        if(dueDate < System.currentTimeMillis()) {
-            countdownView.setTextColor(ContextCompat.getColor(getContext(), R.color.red));
+        if(taskStatus == ToduleDBContract.TodoEntry.TASK_NOT_COMPLETED){
+            if(dueDate < System.currentTimeMillis()) {
+                countdownView.setTextColor(ContextCompat.getColor(getContext(), R.color.red));
+                countdownView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_clear_black_18dp, 0, 0, 0);
+                countdownView.setText("Expired: " + countdownString);
+            } else {
+                countdownView.setTextColor(ContextCompat.getColor(getContext(), R.color.normalGreen));
+                countdownView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_alarm_black_18dp, 0, 0, 0);
+                countdownView.setText(countdownString);
+            }
+
+            // Show mark as done button
+            doneButton.setVisibility(View.VISIBLE);
         } else {
+            Drawable draw = getContext().getDrawable(R.drawable.ic_done_white_18dp).mutate();
+            draw.setColorFilter(ContextCompat.getColor(getContext(), R.color.normalGreen), PorterDuff.Mode.SRC_IN);
             countdownView.setTextColor(ContextCompat.getColor(getContext(), R.color.normalGreen));
+            countdownView.setCompoundDrawablesWithIntrinsicBounds(draw, null, null, null);
+            countdownView.setText("Completed: " + completeDateString);
+
+            // Hide mark as done button
+            doneButton.setVisibility(View.GONE);
         }
 
         createdDateView.setText("Created: " + createDateString);
         dueDateView.setText(dueDateString);
-        countdownView.setText(countdownString);
+
 
         if(labelId != null){
             Uri labelUri = ContentUris.withAppendedId(ToduleDBContract.TodoLabel.CONTENT_ID_URI_BASE, labelId);
@@ -193,13 +217,13 @@ public class ToduleDetailFragment extends Fragment {
             case R.id.action_archive:
                 final Uri entryUri = ContentUris.withAppendedId(ToduleDBContract.TodoEntry.CONTENT_ID_URI_BASE, entryId);
                 final ContentValues cv = new ContentValues();
-                cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_ARCHIVED, 1);
+                cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_ARCHIVED, ToduleDBContract.TodoEntry.TASK_ARCHIVED);
                 getContext().getContentResolver().update(entryUri, cv, null, null);
                 Snackbar mySnackbar = Snackbar.make(getView(), getString(R.string.entry_archived) + ": " + title, Snackbar.LENGTH_LONG);
                 mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_ARCHIVED, 0);
+                        cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_ARCHIVED, ToduleDBContract.TodoEntry.TASK_NOT_ARCHIVED);
                         view.getContext().getContentResolver().update(entryUri, cv, null, null);
                     }
                 });

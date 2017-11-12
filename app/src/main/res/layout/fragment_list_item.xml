@@ -53,37 +53,19 @@
         android:paddingStart="10dp"
         android:paddingEnd="10dp"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+
+    <Button
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@+id/description_text">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/archive_button"
-            android:drawableStart="@drawable/ic_archive_black_18dp"
-            android:background="@drawable/archive_raised_bg"
-            android:textColor="@color/black"
-            android:text="@string/archive"
-            android:elevation="2dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="3dp"
-            style="?android:attr/buttonBarButtonStyle"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/done_button"
-            android:drawableStart="@drawable/ic_done_white_18dp"
-            android:textColor="@color/white"
-            android:background="@drawable/done_raised_bg"
-            android:text="@string/mark_done"
-            android:elevation="2dp"
-            style="?android:attr/buttonBarButtonStyle"/>
-
-    </LinearLayout>
+        android:id="@+id/done_button"
+        android:background="@drawable/done_raised_bg"
+        android:drawableStart="@drawable/ic_done_white_18dp"
+        android:textColor="@color/white"
+        android:text="@string/mark_done"
+        android:elevation="2dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        style="?android:attr/buttonBarButtonStyle"/>
 
 
 

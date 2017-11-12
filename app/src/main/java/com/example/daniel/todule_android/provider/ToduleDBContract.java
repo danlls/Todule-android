@@ -47,6 +47,9 @@ public final class ToduleDBContract {
 
         public static final int TASK_NOT_COMPLETED = 0;
         public static final int TASK_COMPLETED = 1;
+
+        public static final int TASK_NOT_ARCHIVED = 0;
+        public static final int TASK_ARCHIVED = 1;
     }
 
     public static final class TodoLabel implements BaseColumns {
