@@ -63,19 +63,6 @@ public class HistoryAdapter extends CursorAdapter{
             holder.description.setText(R.string.no_descrption);
         }
 
-
-        view.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                if(holder.description.getMaxLines() == 1) {
-                    holder.description.setMaxLines(Integer.MAX_VALUE);
-                    holder.description.setEllipsize(null);
-                } else {
-                    holder.description.setMaxLines(1);
-                    holder.description.setEllipsize(TextUtils.TruncateAt.END);
-                }
-            }
-        });
     }
 
     @Override

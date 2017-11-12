@@ -186,13 +186,7 @@ public class ToduleAddFragment extends Fragment{
         selectLabel.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                ToduleLabelFragment labelFrag = new ToduleLabelFragment();
-                Bundle args = new Bundle();
-                args.putBoolean("select", true);
-                if(chosenLabelId != -1L){
-                    args.putLong("selected_label_id", chosenLabelId);
-                }
-                labelFrag.setArguments(args);
+                ToduleLabelFragment labelFrag = ToduleLabelFragment.newInstance(true, chosenLabelId);
                 myActivity.hideSoftKeyboard(true);
                 myActivity.getSupportFragmentManager().beginTransaction()
                         .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)

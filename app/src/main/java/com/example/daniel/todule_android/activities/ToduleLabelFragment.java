@@ -31,12 +31,24 @@ import com.example.daniel.todule_android.provider.ToduleDBContract.TodoLabel;
  */
 
 public class ToduleLabelFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    private static final int LOADER_ID = 3;
+    private static final int LOADER_ID = 4;
     LabelAdapter lAdapter;
     MainActivity myActivity;
     OnLabelSelectedListener mCallback;
     Long selectedLabelId = null;
     boolean selecting;
+
+    public static ToduleLabelFragment newInstance(boolean select, Long selected_label_id) {
+
+        Bundle args = new Bundle();
+        args.putBoolean("select", select);
+        if (selected_label_id != null){
+            args.putLong("selected_label_id", selected_label_id);
+        }
+        ToduleLabelFragment fragment = new ToduleLabelFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

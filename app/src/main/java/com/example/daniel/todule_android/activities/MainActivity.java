@@ -4,19 +4,22 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TabLayout;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -26,11 +29,14 @@ import com.example.daniel.todule_android.provider.ToduleDBContract;
 import com.example.daniel.todule_android.utilities.DateTimeUtils;
 
 
-public class MainActivity extends AppCompatActivity implements ToduleLabelFragment.OnLabelSelectedListener{
+public class MainActivity extends AppCompatActivity implements
+        ToduleLabelFragment.OnLabelSelectedListener,
+        NavigationView.OnNavigationItemSelectedListener{
 
-    MyPagerAdapter myPagerAdapter;
-    ViewPager mViewPager;
     Context context;
+    private DrawerLayout mDrawerLayout;
+    private NavigationView navigationView;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,34 +44,37 @@ public class MainActivity extends AppCompatActivity implements ToduleLabelFragme
         setContentView(R.layout.activity_main);
         this.context = this;
 
-        myPagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(myPagerAdapter);
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener(){
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        navigationView = (NavigationView) findViewById(R.id.navigation);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this, mDrawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                fabVisibility(false);
             }
+
             @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-            @Override
-            public void onPageSelected(int position) {
-                switch(position){
-                    case 0:
-                        fabVisibility(true);
-                        break;
-                    case 1:
-                        fabVisibility(false);
-                        break;
-                    default:
-                        fabVisibility(false);
-                        break;
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                Fragment f = getSupportFragmentManager().findFragmentByTag("list_frag1");
+
+                if (f != null){
+                    fabVisibility(true);
                 }
             }
-        });
+        };
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager(mViewPager);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -83,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements ToduleLabelFragme
             }
         });
 
-        updateFragmentPresentation();
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
@@ -107,19 +115,38 @@ public class MainActivity extends AppCompatActivity implements ToduleLabelFragme
             }, 500);
 
         }
+
+        // default fragment
+        if (savedInstanceState == null){
+            navigationView.getMenu().getItem(0).setChecked(true);
+            ToduleListFragment frag = ToduleListFragment.newInstance(1);
+            getSupportFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                    .replace(R.id.fragment_container, frag, "list_frag1")
+                    .commit();
+        }
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     private void updateFragmentPresentation(){
         int backStackEntryCount = getSupportFragmentManager().getBackStackEntryCount();
         if(backStackEntryCount > 0){
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            mDrawerToggle.setDrawerIndicatorEnabled(false);
             fabVisibility(false);
-            findViewById(R.id.toolbar).setVisibility(View.GONE);
         }else{
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-            getSupportActionBar().setTitle("Todule");
-            fabVisibility(true);
-            findViewById(R.id.toolbar).setVisibility(View.VISIBLE);
+            mDrawerToggle.setDrawerIndicatorEnabled(true);
         }
     }
 
@@ -154,6 +181,11 @@ public class MainActivity extends AppCompatActivity implements ToduleLabelFragme
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // The action bar home/up action should open or close the drawer.
+        // ActionBarDrawerToggle will take care of this.
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
         switch(item.getItemId()){
             case android.R.id.home:
                 onBackPressed();
@@ -163,41 +195,45 @@ public class MainActivity extends AppCompatActivity implements ToduleLabelFragme
         }
     }
 
-    public class MyPagerAdapter extends FragmentPagerAdapter {
-        public MyPagerAdapter(FragmentManager fm){
-            super(fm);
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int loaderId = 0;
+        switch(item.getGroupId()){
+            case R.id.navgroup_list:
+                switch(item.getItemId()){
+                    case R.id.nav_incomplete:
+                        loaderId = 1;
+                        break;
+                    case R.id.nav_completed:
+                        loaderId = 2;
+                        break;
+                    case R.id.nav_archive:
+                        loaderId = 3;
+                        break;
+                }
+                navigationView.setCheckedItem(item.getItemId());
+                ToduleListFragment frag = ToduleListFragment.newInstance(loaderId);
+                getSupportFragmentManager().beginTransaction()
+                        .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                        .replace(R.id.fragment_container, frag, "list_frag" + String.valueOf(loaderId))
+                        .commit();
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            case R.id.navgroup_setting:
+                switch(item.getItemId()){
+                    case R.id.nav_label:
+                        navigationView.setCheckedItem(item.getItemId());
+                        ToduleLabelFragment labelFrag = ToduleLabelFragment.newInstance(false, null);
+                        getSupportFragmentManager().beginTransaction()
+                                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                                .replace(R.id.fragment_container, labelFrag)
+                                .commit();
+                        mDrawerLayout.closeDrawer(GravityCompat.START);
+                        break;
+                }
+                return true;
         }
-
-        @Override
-        public Fragment getItem(int position) {
-            Fragment fragment=null;
-            switch(position) {
-                case 0:
-                    fragment = Fragment.instantiate(context, ToduleListFragment.class.getName());
-                    break;
-                case 1:
-                    fragment = Fragment.instantiate(context, ToduleHistoryFragment.class.getName());
-                    break;
-            }
-            return fragment;
-        }
-
-        @Override
-        public int getCount() {
-            return 2;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch(position){
-                case 0:
-                    return getString(R.string.todule_list_page_title);
-                case 1:
-                    return getString(R.string.todule_history_page_title);
-                default:
-                    return null;
-            }
-        }
+        return true;
     }
 
     public PendingIntent initReminderPendingIntent(Uri itemUri){

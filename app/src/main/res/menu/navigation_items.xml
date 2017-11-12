@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group
+        android:id="@+id/navgroup_list"
+        android:checkableBehavior="single">
+        <item
+            android:title="@string/todule_title"
+            android:id="@+id/nav_incomplete"
+            android:icon="@drawable/ic_assignment_black_24dp"
+            app:showAsAction="ifRoom|withText"/>
+        <item
+            android:title="@string/completed_title"
+            android:id="@+id/nav_completed"
+            android:icon="@drawable/ic_assignment_turned_in_black_24dp"
+            app:showAsAction="ifRoom|withText"/>
+        <item
+            android:title="@string/archive_title"
+            android:id="@+id/nav_archive"
+            android:icon="@drawable/ic_archive_black_24dp"
+            app:showAsAction="ifRoom|withText"/>
+    </group>
+    <item android:title="Settings">
+        <menu>
+            <group
+                android:id="@+id/navgroup_setting"
+                android:checkableBehavior="single">
+                <item android:title="@string/label_title"
+                    android:icon="@drawable/ic_label_black_24dp"
+                    android:id="@+id/nav_label"
+                    app:showAsAction="ifRoom|withText"/>
+            </group>
+        </menu>
+    </item>
+
+
+</menu>
