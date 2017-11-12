@@ -62,7 +62,7 @@ public class HistoryAdapter extends CursorAdapter{
         } else {
             holder.description.setText(R.string.no_descrption);
         }
-        
+
     }
 
     @Override
