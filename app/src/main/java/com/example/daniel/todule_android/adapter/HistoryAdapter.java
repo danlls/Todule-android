@@ -5,11 +5,11 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
-import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.example.daniel.todule_android.R;
@@ -21,6 +21,7 @@ import com.example.daniel.todule_android.provider.ToduleDBContract;
 
 public class HistoryAdapter extends CursorAdapter{
     private LayoutInflater cursorInflater;
+    private boolean showCheckbox = false;
 
     public HistoryAdapter(Context context, Cursor cursor, int flags){
         super(context, cursor, flags);
@@ -63,6 +64,12 @@ public class HistoryAdapter extends CursorAdapter{
             holder.description.setText(R.string.no_descrption);
         }
 
+        if(showCheckbox){
+            holder.checkbox.setVisibility(View.VISIBLE);
+        } else {
+            holder.checkbox.setVisibility(View.GONE);
+        }
+
     }
 
     @Override
@@ -72,13 +79,19 @@ public class HistoryAdapter extends CursorAdapter{
         holder.title = rowView.findViewById(R.id.title_text);
         holder.description = rowView.findViewById(R.id.description_text);
         holder.completed = rowView.findViewById(R.id.completed_date_text);
+        holder.checkbox = rowView.findViewById(R.id.checkbox);
         rowView.setTag(holder);
         return rowView;
+    }
+
+    public void setShowCheckbox(boolean b){
+        showCheckbox = b;
     }
 
     static class ViewHolder {
         TextView title;
         TextView description;
         TextView completed;
+        CheckBox checkbox;
     }
 }

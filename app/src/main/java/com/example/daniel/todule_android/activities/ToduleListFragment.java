@@ -1,42 +1,38 @@
 package com.example.daniel.todule_android.activities;
 
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.transition.Fade;
-import android.support.transition.TransitionInflater;
-import android.support.transition.TransitionSet;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.ViewCompat;
+import android.support.v4.util.LongSparseArray;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.adapter.HistoryAdapter;
 import com.example.daniel.todule_android.adapter.MainCursorAdapter;
+import com.example.daniel.todule_android.parcelable.LongSparseArrayBooleanParcelable;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
 
 /**
@@ -53,6 +49,7 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
     private ScrollView emptyView;
     private SwipeRefreshLayout swipeContainer;
     private int loaderId;
+    private LongSparseArray<Boolean> selectedIds;
 
     public static ToduleListFragment newInstance(int id){
         ToduleListFragment f = new ToduleListFragment();
@@ -67,6 +64,11 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         loaderId = getArguments().getInt("loader_id");
+        if(savedInstanceState != null){
+            selectedIds = savedInstanceState.getParcelable("myLongSparseBooleanArray");
+        } else{
+            selectedIds = new LongSparseArray<>();
+        }
     }
 
     @Override
@@ -108,6 +110,28 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
 
         myActivity.getSupportActionBar().setTitle(getTitle(loaderId));
 
+        listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+        listView.setMultiChoiceModeListener(myMultiChoiceModeListener);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                ToduleDetailFragment frag = ToduleDetailFragment.newInstance(l);
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                        .replace(R.id.fragment_container, frag, "detail_frag")
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(myActivity, "test", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -122,14 +146,9 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        ToduleDetailFragment frag = ToduleDetailFragment.newInstance(id);
-        getActivity().getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
-                .replace(R.id.fragment_container, frag, "detail_frag")
-                .addToBackStack(null)
-                .commit();
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("myLongSparseBooleanArray", new LongSparseArrayBooleanParcelable(selectedIds));
     }
 
     @Override
@@ -201,50 +220,6 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
         getActivity().getSupportLoaderManager().restartLoader(loaderId, null, this);
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
-        switch(loaderId){
-            case ARCHIVE_LOADER_ID:
-                inflater.inflate(R.menu.menu_fragment_archive, menu);
-                break;
-            default:
-                break;
-        }
-
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.action_clear_archive:
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage(getString(R.string.clear_archive_dialog_msg) + "\n(This action is irreversible)");
-                builder.setTitle(R.string.clear_archive_dialog_title);
-                builder.setPositiveButton(R.string.clear_archive_dialog_positive, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User clicked OK button
-                        String selectionClause = TodoEntry.COLUMN_NAME_ARCHIVED + " = ?";
-                        String[] selectionArgs = {"1"};
-                        int count = getContext().getContentResolver().delete(TodoEntry.CONTENT_URI, selectionClause, selectionArgs);
-                        if (count > 0){
-                            Toast.makeText(getContext(), String.valueOf(count) + " " + getString(R.string.entry_deleted), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-                builder.setNegativeButton(R.string.clear_archive_dialog_negative, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User cancelled the dialog
-                    }
-                });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     public String getTitle(int id){
         switch(id){
@@ -257,5 +232,121 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
             default:
                 return "";
         }
+    }
+
+    private AbsListView.MultiChoiceModeListener myMultiChoiceModeListener = new AbsListView.MultiChoiceModeListener() {
+        @Override
+        public void onItemCheckedStateChanged(ActionMode actionMode, int i, long l, boolean b) {
+            if(b){
+                selectedIds.put(l, b);
+            } else {
+                selectedIds.remove(l);
+            }
+            actionMode.setTitle(selectedIds.size() + " selected");
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            MenuInflater inflater = actionMode.getMenuInflater();
+            inflater.inflate(getMenuRes(loaderId), menu);
+
+            // Show checkboxes
+            if(mAdapter instanceof HistoryAdapter){
+                ((HistoryAdapter) mAdapter).setShowCheckbox(true);
+            } else if (mAdapter instanceof MainCursorAdapter){
+                ((MainCursorAdapter) mAdapter).setShowCheckbox(true);
+            }
+
+            actionMode.setTitle(selectedIds.size() + " selected");
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            if(loaderId == INCOMPLETE_LOADER_ID){
+                // remove edit action
+                menu.removeItem(R.id.action_edit);
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            switch (menuItem.getItemId()) {
+                case R.id.action_delete:
+                    deleteSelectedItems();
+                    actionMode.finish(); // Action picked, so close the CAB
+                    return true;
+                case R.id.action_archive:
+                    archiveSelectedItems();
+                    actionMode.finish();
+                    return true;
+                case R.id.action_unarchive:
+                    unarchiveSelectedItems();
+                    actionMode.finish();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode actionMode) {
+            selectedIds.clear();
+            if(mAdapter instanceof HistoryAdapter){
+                ((HistoryAdapter) mAdapter).setShowCheckbox(false);
+            } else if (mAdapter instanceof MainCursorAdapter){
+                ((MainCursorAdapter) mAdapter).setShowCheckbox(false);
+            }
+        }
+    };
+
+    private void deleteSelectedItems(){
+        ContentResolver resolver = getContext().getContentResolver();
+        int size = selectedIds.size();
+        for (int i = 0; i < size; i++){
+            long id = selectedIds.keyAt(i);
+            Uri entryUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
+            resolver.delete(entryUri, null, null);
+        }
+        Toast.makeText(myActivity, size + getString(R.string.entry_deleted), Toast.LENGTH_SHORT).show();
+    }
+
+    private void archiveSelectedItems(){
+        ContentResolver resolver = getContext().getContentResolver();
+        int size = selectedIds.size();
+        for (int i = 0; i < size; i++){
+            long id = selectedIds.keyAt(i);
+            Uri entryUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
+            ContentValues cv = new ContentValues();
+            cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, TodoEntry.TASK_ARCHIVED);
+            resolver.update(entryUri, cv, null, null);
+        }
+        Toast.makeText(myActivity, size + getString(R.string.entry_archived), Toast.LENGTH_SHORT).show();
+    }
+
+    private void unarchiveSelectedItems(){
+        ContentResolver resolver = getContext().getContentResolver();
+        int size = selectedIds.size();
+        for (int i = 0; i < size; i++){
+            long id = selectedIds.keyAt(i);
+            Uri entryUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
+            ContentValues cv = new ContentValues();
+            cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, TodoEntry.TASK_NOT_ARCHIVED);
+            resolver.update(entryUri, cv, null, null);
+        }
+        Toast.makeText(myActivity, size + getString(R.string.entry_archived), Toast.LENGTH_SHORT).show();
+    }
+
+    private int getMenuRes(int id){
+        switch(id){
+            case INCOMPLETE_LOADER_ID:
+                return R.menu.menu_entry_incomplete;
+            case COMPLETED_LOADER_ID:
+                return R.menu.menu_entry_completed;
+            case ARCHIVE_LOADER_ID:
+                return R.menu.menu_entry_archived;
+        }
+        return -1;
     }
 }

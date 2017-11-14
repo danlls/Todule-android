@@ -200,6 +200,7 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
                 }
             }
         });
+        lAdapter.setShowCheckbox(true);
     }
 
     public interface OnLabelSelectedListener {

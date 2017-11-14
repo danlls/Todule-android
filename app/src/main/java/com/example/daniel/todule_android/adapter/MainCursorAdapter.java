@@ -8,12 +8,12 @@ import android.net.Uri;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
-import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.example.daniel.todule_android.R;
@@ -28,6 +28,7 @@ import com.example.daniel.todule_android.utilities.DateTimeUtils;
 
 public class MainCursorAdapter extends CursorAdapter {
     private LayoutInflater cursorInflater;
+    private boolean showCheckbox = false;
 
     public MainCursorAdapter(Context context, Cursor cursor, int flags){
         super(context, cursor, flags);
@@ -100,26 +101,12 @@ public class MainCursorAdapter extends CursorAdapter {
             }
         });
 
-//        holder.archiveButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                final ContentValues cv = new ContentValues();
-//                cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, 1);
-//                Uri aUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
-//                view.getContext().getContentResolver().update(aUri, cv, null, null);
-//                Snackbar mySnackbar = Snackbar.make(view, context.getString(R.string.entry_archived) + ": " + title, Snackbar.LENGTH_LONG);
-//                mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, 0);
-//                        Uri aUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
-//                        view.getContext().getContentResolver().update(aUri, cv, null, null);
-//                    }
-//                });
-//                mySnackbar.show();
-//            }
-//        });
 
+        if(showCheckbox){
+            holder.checkBox.setVisibility(View.VISIBLE);
+        } else {
+            holder.checkBox.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -132,8 +119,13 @@ public class MainCursorAdapter extends CursorAdapter {
         holder.countdown = rowView.findViewById(R.id.countdown_text);
         holder.label = rowView.findViewById(R.id.entry_label);
         holder.doneButton =  rowView.findViewById(R.id.done_button);
+        holder.checkBox = rowView.findViewById(R.id.checkbox);
         rowView.setTag(holder);
         return rowView;
+    }
+
+    public void setShowCheckbox(boolean b){
+        showCheckbox = b;
     }
 
     static class ViewHolder {
@@ -143,6 +135,7 @@ public class MainCursorAdapter extends CursorAdapter {
         TextView countdown;
         TextView label;
         Button doneButton;
+        CheckBox checkBox;
     }
 
 }
