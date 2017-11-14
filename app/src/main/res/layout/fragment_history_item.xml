@@ -1,35 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.example.daniel.todule_android.layout.CheckableLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:descendantFocusability="blocksDescendants"
+    android:id="@+id/checkable_layout">
 
-    <TextView android:id="@+id/title_text"
-        android:textSize="20sp"
+    <CheckBox
+        android:id="@+id/checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/completed_date_text"
-        android:textColor="@color/black"
-        android:layout_alignParentLeft="true"/>
+        android:layout_gravity="center_vertical"
+        android:clickable="false"
+        android:layout_marginEnd="@dimen/default_padding_side"/>
 
-    <TextView android:id="@+id/description_text"
-        android:textSize="16sp"
+    <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/title_text"
-        android:paddingBottom="10dp"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:layout_alignParentLeft="true"
-        android:paddingTop="5dp"/>
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/completed_date_text"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:drawableLeft="@drawable/ic_done_white_18dp"
-        android:drawableTint="@color/normalGreen"/>
+        <TextView android:id="@+id/title_text"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:layout_alignParentStart="true"
+            android:layout_toRightOf="@+id/completed_date_text"/>
 
-</RelativeLayout>
+        <TextView android:id="@+id/description_text"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/title_text"
+            android:paddingBottom="10dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:paddingTop="5dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/completed_date_text"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:drawableStart="@drawable/ic_done_white_18dp"
+            android:drawableTint="@color/normalGreen"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+    </RelativeLayout>
+
+
+
+
+</com.example.daniel.todule_android.layout.CheckableLinearLayout>
