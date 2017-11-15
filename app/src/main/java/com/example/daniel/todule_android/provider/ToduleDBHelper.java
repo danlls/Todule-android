@@ -22,7 +22,9 @@ public class ToduleDBHelper extends SQLiteOpenHelper{
                     TodoEntry.COLUMN_NAME_TASK_DONE + " INTEGER DEFAULT 0," +
                     TodoEntry.COLUMN_NAME_COMPLETED_DATE + " INTEGER DEFAULT NULL," +
                     TodoEntry.COLUMN_NAME_ARCHIVED + " INTEGER DEFAULT 0," +
-                    TodoEntry.COLUMN_NAME_LABEL + " INTEGER DEFAULT NULL" +
+                    TodoEntry.COLUMN_NAME_LABEL + " INTEGER DEFAULT NULL," +
+                    TodoEntry.COLUMN_NAME_DELETED + " INTEGER DEFAULT 0," +
+                    TodoEntry.COLUMN_NAME_DELETION_DATE + " INTEGER DEFAULT NULL" +
                     ");";
 
     private static final String SQL_DELETE_ENTRIES =
@@ -41,7 +43,7 @@ public class ToduleDBHelper extends SQLiteOpenHelper{
 
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 10;
+    public static final int DATABASE_VERSION = 12;
     public static final String DATABASE_NAME = "Todule.db";
 
     public ToduleDBHelper(Context context) {
@@ -66,6 +68,10 @@ public class ToduleDBHelper extends SQLiteOpenHelper{
         }
         if (oldVersion < 9) {
             db.execSQL("ALTER TABLE " + TodoLabel.TABLE_NAME + " ADD COLUMN " + TodoLabel.COLUMN_NAME_TEXT_COLOR + " INTEGER");
+        }
+        if(oldVersion <12) {
+            db.execSQL("ALTER TABLE " + TodoEntry.TABLE_NAME + " ADD COLUMN " + TodoEntry.COLUMN_NAME_DELETED + " INTEGER DEFAULT 0");
+            db.execSQL("ALTER TABLE " + TodoEntry.TABLE_NAME + " ADD COLUMN " + TodoEntry.COLUMN_NAME_DELETION_DATE + " INTEGER DEFAULT NULL");
         }
         else {
             db.execSQL(SQL_DELETE_ENTRIES);

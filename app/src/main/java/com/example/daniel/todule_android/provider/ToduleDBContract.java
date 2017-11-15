@@ -31,6 +31,8 @@ public final class ToduleDBContract {
         public static final String COLUMN_NAME_COMPLETED_DATE = "completed_date";
         public static final String COLUMN_NAME_ARCHIVED = "archived";
         public static final String COLUMN_NAME_LABEL = "label";
+        public static final String COLUMN_NAME_DELETED = "deleted";
+        public static final String COLUMN_NAME_DELETION_DATE = "deletion_date";
 
 
         public static final Uri CONTENT_URI =  Uri.parse(SCHEME + AUTHORITY + SLASH + TABLE_NAME);
@@ -42,7 +44,8 @@ public final class ToduleDBContract {
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/vnd.com.example.todule.todo_entry";
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/vnd.com.example.todule.todo_entry";
         public static final String[] PROJECTION_ALL = {_ID, COLUMN_NAME_TITLE, COLUMN_NAME_DESCRIPTION,
-            COLUMN_NAME_CREATED_DATE, COLUMN_NAME_DUE_DATE, COLUMN_NAME_TASK_DONE, COLUMN_NAME_COMPLETED_DATE, COLUMN_NAME_ARCHIVED, COLUMN_NAME_LABEL };
+            COLUMN_NAME_CREATED_DATE, COLUMN_NAME_DUE_DATE, COLUMN_NAME_TASK_DONE, COLUMN_NAME_COMPLETED_DATE,
+                COLUMN_NAME_ARCHIVED, COLUMN_NAME_LABEL, COLUMN_NAME_DELETED, COLUMN_NAME_DELETION_DATE };
         public static final String SORT_ORDER_DEFAULT = COLUMN_NAME_DUE_DATE + " ASC";
 
         public static final int TASK_NOT_COMPLETED = 0;
@@ -50,6 +53,9 @@ public final class ToduleDBContract {
 
         public static final int TASK_NOT_ARCHIVED = 0;
         public static final int TASK_ARCHIVED = 1;
+
+        public static final int TASK_NOT_DELETED = 0;
+        public static final int TASK_DELETED = 1;
     }
 
     public static final class TodoLabel implements BaseColumns {

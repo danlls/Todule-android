@@ -19,6 +19,11 @@
             android:id="@+id/nav_archive"
             android:icon="@drawable/ic_archive_black_24dp"
             app:showAsAction="ifRoom|withText"/>
+        <item
+            android:title="@string/deleted_title"
+            android:id="@+id/nav_deleted"
+            android:icon="@drawable/ic_delete_white_24dp"
+            app:showAsAction="ifRoom|withText"/>
     </group>
     <item android:title="Settings">
         <menu>
