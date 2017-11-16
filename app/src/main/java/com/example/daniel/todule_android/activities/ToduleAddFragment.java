@@ -9,6 +9,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
@@ -104,15 +106,41 @@ public class ToduleAddFragment extends Fragment{
         }
         View view = inflater.inflate(R.layout.fragment_add, container, false);
 
-        EditText titleEdit = view.findViewById(R.id.edit_title);
-        EditText descriptionEdit = view.findViewById(R.id.edit_description);
-        final EditText dateEdit = view.findViewById(R.id.edit_date);
-        final EditText timeEdit = view.findViewById(R.id.edit_time);
+        final TextInputEditText titleEdit = view.findViewById(R.id.edit_title);
+        final TextInputLayout titleWrapper = view.findViewById(R.id.edit_title_wrapper);
+
+        TextInputEditText descriptionEdit = view.findViewById(R.id.edit_description);
+        TextInputLayout descriptionWrapper = view.findViewById(R.id.edit_description_wrapper);
+
+        final TextInputEditText dateEdit = view.findViewById(R.id.edit_date);
+        final TextInputLayout timeWrapper = view.findViewById(R.id.edit_time_wrapper);
+        final TextInputEditText timeEdit = view.findViewById(R.id.edit_time);
         dateEdit.setInputType(InputType.TYPE_NULL);
         timeEdit.setInputType(InputType.TYPE_NULL);
 
         titleEdit.setText(title);
         descriptionEdit.setText(description);
+
+        titleEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(titleEdit.getText().toString().isEmpty()){
+                    titleWrapper.setErrorEnabled(true);
+                    titleWrapper.setError("This field is required");
+                } else {
+                    titleWrapper.setError(null);
+                    titleWrapper.setErrorEnabled(false);
+                }
+            }
+        });
 
         dateEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -168,6 +196,29 @@ public class ToduleAddFragment extends Fragment{
             }
         });
 
+        timeEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                long date_time = myCalendar.getTimeInMillis();
+                long current_date_time = System.currentTimeMillis();
+                if (date_time < current_date_time) {
+                    timeWrapper.setErrorEnabled(true);
+                    timeWrapper.setError("Please select a date later than now");
+                } else {
+                    timeWrapper.setError(null);
+                    timeWrapper.setErrorEnabled(false);
+                }
+            }
+        });
+
 
         DateFormat df = DateFormat.getDateInstance();
         dateEdit.setText(df.format(myCalendar.getTime()));
@@ -214,8 +265,6 @@ public class ToduleAddFragment extends Fragment{
             chosenLabel.setText(R.string.no_label_selected);
         }
 
-
-
         return view;
     }
 
@@ -250,10 +299,10 @@ public class ToduleAddFragment extends Fragment{
     }
 
     private void updateEntry(){
-        EditText title = (EditText) getView().findViewById(R.id.edit_title);
+        TextInputEditText title = getView().findViewById(R.id.edit_title);
         String title_text = title.getText().toString();
 
-        EditText description = (EditText) getView().findViewById(R.id.edit_description);
+        TextInputEditText description = getView().findViewById(R.id.edit_description);
         String description_text = description.getText().toString();
 
         long due_date = myCalendar.getTimeInMillis();
@@ -286,24 +335,33 @@ public class ToduleAddFragment extends Fragment{
     private boolean validateInputs() {
         boolean valid = true;
         // Validates title (required field, ensure title is given.)
-        EditText title = (EditText) getView().findViewById(R.id.edit_title);
+        TextInputLayout titleWrapper = getView().findViewById(R.id.edit_title_wrapper);
+        TextInputEditText title = getView().findViewById(R.id.edit_title);
+
         if (title.getText().toString().isEmpty()) {
-            title.setError("This field is required.");
+            titleWrapper.setErrorEnabled(true);
+            titleWrapper.setError("This field is required.");
             title.requestFocus();
             myActivity.hideSoftKeyboard(false);
             valid = false;
+        } else {
+            titleWrapper.setError(null);
+            titleWrapper.setErrorEnabled(false);
         }
 
         // Validates due_date (must be later than now.)
-        EditText time = (EditText) getView().findViewById(R.id.edit_time);
+        TextInputLayout timeWrapper = getView().findViewById(R.id.edit_time_wrapper);
+        TextInputEditText time = getView().findViewById(R.id.edit_time);
         long date_time = myCalendar.getTimeInMillis();
         long current_date_time = System.currentTimeMillis();
         if (date_time < current_date_time){
-            time.setError("Please select a time later than now");
+            timeWrapper.setErrorEnabled(true);
+            timeWrapper.setError("Please select a time later than now");
             time.requestFocus();
             valid = false;
         } else {
             time.setError(null);
+            timeWrapper.setErrorEnabled(false);
         }
 
         return valid;
