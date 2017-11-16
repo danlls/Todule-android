@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -16,6 +17,7 @@ import android.support.v4.util.LongSparseArray;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,6 +45,7 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
     private static final int INCOMPLETE_LOADER_ID = 1;
     private static final int COMPLETED_LOADER_ID = 2;
     private static final int ARCHIVE_LOADER_ID = 3;
+    private static final int DELETED_LOADER_ID = 4;
     private CursorAdapter mAdapter;
     private MainActivity myActivity;
     private ListView listView;
@@ -81,10 +84,8 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
                 myActivity.fabVisibility(true);
                 break;
             case COMPLETED_LOADER_ID:
-                mAdapter = new HistoryAdapter(getActivity(), null, 0);
-                myActivity.fabVisibility(false);
-                break;
             case ARCHIVE_LOADER_ID:
+            case DELETED_LOADER_ID:
                 mAdapter = new HistoryAdapter(getActivity(), null, 0);
                 myActivity.fabVisibility(false);
                 break;
@@ -95,18 +96,7 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
         listView.setAdapter(mAdapter);
         listView.setEmptyView(emptyView);
 
-        switch(loaderId){
-            case INCOMPLETE_LOADER_ID:
-                getActivity().getSupportLoaderManager().initLoader(INCOMPLETE_LOADER_ID, null, this);
-                break;
-            case COMPLETED_LOADER_ID:
-                getActivity().getSupportLoaderManager().initLoader(COMPLETED_LOADER_ID, null, this);
-                break;
-            case ARCHIVE_LOADER_ID:
-                getActivity().getSupportLoaderManager().initLoader(ARCHIVE_LOADER_ID, null, this);
-            default:
-                break;
-        }
+        getActivity().getSupportLoaderManager().initLoader(loaderId, null, this);
 
         myActivity.getSupportActionBar().setTitle(getTitle(loaderId));
 
@@ -116,7 +106,7 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ToduleDetailFragment frag = ToduleDetailFragment.newInstance(l);
+                ToduleDetailFragment frag = ToduleDetailFragment.newInstance(l, loaderId);
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
                         .replace(R.id.fragment_container, frag, "detail_frag")
@@ -153,44 +143,52 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        CursorLoader cursorLoader = null;
+        CursorLoader cursorLoader;
         Uri ENTRY_URI = TodoEntry.CONTENT_URI;
         String select = "";
-        String[] selectionArgs;
+        String[] selectionArgs = {};
 
         switch(loaderId){
             case INCOMPLETE_LOADER_ID:
                 select = "(" + TodoEntry.COLUMN_NAME_TITLE + " NOTNULL) AND ("
-                        + TodoEntry.COLUMN_NAME_TASK_DONE + " == ?)";
+                        + TodoEntry.COLUMN_NAME_TASK_DONE + " == ?) AND ("
+                        + TodoEntry.COLUMN_NAME_DELETED + " == ?)";
                 selectionArgs = new String []{
-                        String.valueOf(TodoEntry.TASK_NOT_COMPLETED)
+                        String.valueOf(TodoEntry.TASK_NOT_COMPLETED),
+                        String.valueOf(TodoEntry.TASK_NOT_DELETED)
                 };
-                cursorLoader = new CursorLoader(getActivity(), ENTRY_URI,
-                        TodoEntry.PROJECTION_ALL, select, selectionArgs, TodoEntry.SORT_ORDER_DEFAULT);
                 break;
             case COMPLETED_LOADER_ID:
                 select = "(" + TodoEntry.COLUMN_NAME_TITLE + " NOTNULL) AND ("
                         + TodoEntry.COLUMN_NAME_TASK_DONE + " == ?) AND ("
-                        + TodoEntry.COLUMN_NAME_ARCHIVED + " == ?)";
+                        + TodoEntry.COLUMN_NAME_ARCHIVED + " == ?) AND ("
+                        + TodoEntry.COLUMN_NAME_DELETED + " == ?)";
                 selectionArgs = new String[] {
                         String.valueOf(TodoEntry.TASK_COMPLETED),
-                        String.valueOf(TodoEntry.TASK_NOT_ARCHIVED)
+                        String.valueOf(TodoEntry.TASK_NOT_ARCHIVED),
+                        String.valueOf(TodoEntry.TASK_NOT_DELETED)
                 };
-                cursorLoader = new CursorLoader(getActivity(), ENTRY_URI,
-                        TodoEntry.PROJECTION_ALL, select, selectionArgs, TodoEntry.SORT_ORDER_DEFAULT);
                 break;
             case ARCHIVE_LOADER_ID:
                 select = "(" + TodoEntry.COLUMN_NAME_TITLE + " NOTNULL) AND ("
-                        + TodoEntry.COLUMN_NAME_ARCHIVED + " == ?)";
+                        + TodoEntry.COLUMN_NAME_ARCHIVED + " == ?) AND ("
+                        + TodoEntry.COLUMN_NAME_DELETED + " == ?)";
                 selectionArgs = new String []{
-                        String.valueOf(TodoEntry.TASK_ARCHIVED)
+                        String.valueOf(TodoEntry.TASK_ARCHIVED),
+                        String.valueOf(TodoEntry.TASK_NOT_DELETED)
                 };
-                cursorLoader = new CursorLoader(getActivity(), ENTRY_URI,
-                        TodoEntry.PROJECTION_ALL, select, selectionArgs, TodoEntry.SORT_ORDER_DEFAULT);
                 break;
+            case DELETED_LOADER_ID:
+                select = "(" + TodoEntry.COLUMN_NAME_TITLE + " NOTNULL) AND ("
+                    + TodoEntry.COLUMN_NAME_DELETED + " == ?)";
+                selectionArgs = new String[]{
+                        String.valueOf(TodoEntry.TASK_DELETED)
+                };
             default:
                 break;
         }
+        cursorLoader = new CursorLoader(getActivity(), ENTRY_URI,
+                TodoEntry.PROJECTION_ALL, select, selectionArgs, TodoEntry.SORT_ORDER_DEFAULT);
         return cursorLoader;
     }
 
@@ -229,6 +227,8 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
                 return getContext().getString(R.string.completed_title);
             case ARCHIVE_LOADER_ID:
                 return getContext().getString(R.string.archive_title);
+            case DELETED_LOADER_ID:
+                return getContext().getString(R.string.deleted_title);
             default:
                 return "";
         }
@@ -267,14 +267,17 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
                 // remove edit action
                 menu.removeItem(R.id.action_edit);
             }
+            if (loaderId == DELETED_LOADER_ID){
+                menu.removeItem(R.id.action_empty_bin);
+            }
             return true;
         }
 
         @Override
         public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
             switch (menuItem.getItemId()) {
-                case R.id.action_delete:
-                    deleteSelectedItems();
+                case R.id.action_soft_delete:
+                    softDeleteSelectedItems();
                     actionMode.finish(); // Action picked, so close the CAB
                     return true;
                 case R.id.action_archive:
@@ -283,6 +286,14 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
                     return true;
                 case R.id.action_unarchive:
                     unarchiveSelectedItems();
+                    actionMode.finish();
+                    return true;
+                case R.id.action_restore:
+                    restoreSelectedItems();
+                    actionMode.finish();
+                    return true;
+                case R.id.action_delete_forever:
+                    deleteSelectedItems();
                     actionMode.finish();
                     return true;
                 default:
@@ -301,44 +312,147 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
         }
     };
 
+    private void softDeleteSelectedItems(){
+        final ContentResolver resolver = getContext().getContentResolver();
+        int size = selectedIds.size();
+        Long[] mArray = new Long[size];
+        for (int i = 0; i < size; i++) {
+            long id = selectedIds.keyAt(i);
+            mArray[i] = id;
+        }
+        ContentValues cv = new ContentValues();
+        cv.put(TodoEntry.COLUMN_NAME_DELETED, TodoEntry.TASK_DELETED);
+        cv.put(TodoEntry.COLUMN_NAME_DELETION_DATE, System.currentTimeMillis());
+        final String select = TodoEntry._ID + " IN(?)";
+        final String[] selectionArgs = new String[] {TextUtils.join(", ", mArray)};
+        int count = resolver.update(TodoEntry.CONTENT_URI, cv, select, selectionArgs);
+        Snackbar mySnackbar = Snackbar.make(getView(), String.valueOf(count) + " " + getString(R.string.entry_deleted), Snackbar.LENGTH_LONG);
+        mySnackbar.setAction(R.string.undo_string, new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                ContentValues cv = new ContentValues();
+                cv.put(TodoEntry.COLUMN_NAME_DELETED, TodoEntry.TASK_NOT_DELETED);
+                cv.putNull(TodoEntry.COLUMN_NAME_DELETION_DATE);
+                resolver.update(TodoEntry.CONTENT_URI, cv, select, selectionArgs);
+            }
+        });
+        mySnackbar.show();
+    }
+
+    private void restoreSelectedItems(){
+        final ContentResolver resolver = getContext().getContentResolver();
+        int size = selectedIds.size();
+        Long[] mArray = new Long[size];
+        for (int i = 0; i < size; i++) {
+            long id = selectedIds.keyAt(i);
+            mArray[i] = id;
+        }
+        ContentValues cv = new ContentValues();
+        cv.put(TodoEntry.COLUMN_NAME_DELETED, TodoEntry.TASK_NOT_DELETED);
+        cv.putNull(TodoEntry.COLUMN_NAME_DELETION_DATE);
+        final String select = TodoEntry._ID + " IN(?)";
+        final String[] selectionArgs = new String[] {TextUtils.join(", ", mArray)};
+        int count = resolver.update(TodoEntry.CONTENT_URI, cv, select ,selectionArgs);
+        Snackbar mySnackbar = Snackbar.make(getView(), String.valueOf(count)+ " " + getString(R.string.entry_restored), Snackbar.LENGTH_LONG);
+        mySnackbar.setAction(R.string.undo_string, new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                ContentValues cv = new ContentValues();
+                cv.put(TodoEntry.COLUMN_NAME_DELETED, TodoEntry.TASK_DELETED);
+                cv.put(TodoEntry.COLUMN_NAME_DELETION_DATE, System.currentTimeMillis());
+                resolver.update(TodoEntry.CONTENT_URI, cv, select, selectionArgs);
+            }
+        });
+        mySnackbar.show();
+    }
+
     private void deleteSelectedItems(){
         ContentResolver resolver = getContext().getContentResolver();
         int size = selectedIds.size();
-        for (int i = 0; i < size; i++){
+        Long[] mArray = new Long[size];
+        for (int i = 0; i < size; i++) {
             long id = selectedIds.keyAt(i);
-            Uri entryUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
-            resolver.delete(entryUri, null, null);
+            mArray[i] = id;
         }
-        Toast.makeText(myActivity, size + getString(R.string.entry_deleted), Toast.LENGTH_SHORT).show();
+        final String select = TodoEntry._ID + " IN(?)";
+        final String[] selectionArgs = new String[] {TextUtils.join(", ", mArray)};
+        int count = resolver.delete(TodoEntry.CONTENT_URI , select, selectionArgs);
+        Toast.makeText(myActivity, count + " " + getString(R.string.entry_deleted), Toast.LENGTH_SHORT).show();
     }
 
     private void archiveSelectedItems(){
-        ContentResolver resolver = getContext().getContentResolver();
+        final ContentResolver resolver = getContext().getContentResolver();
         int size = selectedIds.size();
-        for (int i = 0; i < size; i++){
+        Long[] mArray = new Long[size];
+        for (int i = 0; i < size; i++) {
             long id = selectedIds.keyAt(i);
-            Uri entryUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
-            ContentValues cv = new ContentValues();
-            cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, TodoEntry.TASK_ARCHIVED);
-            resolver.update(entryUri, cv, null, null);
+            mArray[i] = id;
         }
-        Toast.makeText(myActivity, size + getString(R.string.entry_archived), Toast.LENGTH_SHORT).show();
+        ContentValues cv = new ContentValues();
+        cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, TodoEntry.TASK_ARCHIVED);
+        final String select = TodoEntry._ID + " IN(?)";
+        final String[] selectionArgs = new String[] {TextUtils.join(", ", mArray)};
+        int count = resolver.update(TodoEntry.CONTENT_URI, cv, select, selectionArgs);
+        Snackbar mySnackbar = Snackbar.make(getView(), String.valueOf(count)+ " " + getString(R.string.entry_archived), Snackbar.LENGTH_LONG);
+        mySnackbar.setAction(R.string.undo_string, new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                ContentValues cv = new ContentValues();
+                cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, TodoEntry.TASK_NOT_ARCHIVED);
+                resolver.update(TodoEntry.CONTENT_URI, cv, select, selectionArgs);
+            }
+        });
+        mySnackbar.show();
     }
 
     private void unarchiveSelectedItems(){
-        ContentResolver resolver = getContext().getContentResolver();
+        final ContentResolver resolver = getContext().getContentResolver();
         int size = selectedIds.size();
-        for (int i = 0; i < size; i++){
+        Long[] mArray = new Long[size];
+        for (int i = 0; i < size; i++) {
             long id = selectedIds.keyAt(i);
-            Uri entryUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, id);
-            ContentValues cv = new ContentValues();
-            cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, TodoEntry.TASK_NOT_ARCHIVED);
-            resolver.update(entryUri, cv, null, null);
+            mArray[i] = id;
         }
-        Toast.makeText(myActivity, size + getString(R.string.entry_archived), Toast.LENGTH_SHORT).show();
+        ContentValues cv = new ContentValues();
+        cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, TodoEntry.TASK_NOT_ARCHIVED);
+        final String select = TodoEntry._ID + " IN(?)";
+        final String[] selectionArgs = new String[] {TextUtils.join(", ", mArray)};
+        int count = resolver.update(TodoEntry.CONTENT_URI, cv, select, selectionArgs);
+        Snackbar mySnackbar = Snackbar.make(getView(), String.valueOf(count) + " " + getString(R.string.entry_unarchived), Snackbar.LENGTH_LONG);
+        mySnackbar.setAction(R.string.undo_string, new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                ContentValues cv = new ContentValues();
+                cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, TodoEntry.TASK_ARCHIVED);
+                resolver.update(TodoEntry.CONTENT_URI, cv, select, selectionArgs);
+            }
+        });
+        mySnackbar.show();
     }
 
-    private int getMenuRes(int id){
+    private void emptyBin(){
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Empty bin")
+            .setMessage("All entries removed from the bin cannot be recovered!")
+            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    String select = TodoEntry.COLUMN_NAME_DELETED + " == ?" + TodoEntry.TASK_DELETED;
+                    String[] selectionArgs = new String[]{
+                            String.valueOf(TodoEntry.TASK_DELETED)
+                    };
+                    getContext().getContentResolver().delete(TodoEntry.CONTENT_URI, select, selectionArgs);
+                    Toast.makeText(myActivity, getString(R.string.bin_emptied) , Toast.LENGTH_SHORT).show();
+                }
+            })
+            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            })
+            .show();
+    }
+
+    public static int getMenuRes(int id){
         switch(id){
             case INCOMPLETE_LOADER_ID:
                 return R.menu.menu_entry_incomplete;
@@ -346,7 +460,29 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
                 return R.menu.menu_entry_completed;
             case ARCHIVE_LOADER_ID:
                 return R.menu.menu_entry_archived;
+            case DELETED_LOADER_ID:
+                return R.menu.menu_entry_deleted;
         }
         return -1;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if(loaderId == DELETED_LOADER_ID){
+            inflater.inflate(R.menu.menu_fragment_bin, menu);
+        }
+        super.onCreateOptionsMenu(menu, inflater);
+
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.action_empty_bin:
+                emptyBin();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

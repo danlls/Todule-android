@@ -104,21 +104,21 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         // Check if activity is launched with todule_id (From notification)
-        final long entryId = getIntent().getLongExtra("todule_id", -1L);
-        if(entryId != -1L){
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ToduleDetailFragment frag = ToduleDetailFragment.newInstance(entryId);
-                    getSupportFragmentManager().beginTransaction()
-                            .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
-                            .replace(R.id.fragment_container, frag)
-                            .addToBackStack(null)
-                            .commit();
-                }
-            }, 500);
-
-        }
+//        final long entryId = getIntent().getLongExtra("todule_id", -1L);
+//        if(entryId != -1L){
+//            new Handler().postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    ToduleDetailFragment frag = ToduleDetailFragment.newInstance(entryId);
+//                    getSupportFragmentManager().beginTransaction()
+//                            .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+//                            .replace(R.id.fragment_container, frag)
+//                            .addToBackStack(null)
+//                            .commit();
+//                }
+//            }, 500);
+//
+//        }
 
         // default fragment
         if (savedInstanceState == null){
@@ -214,6 +214,9 @@ public class MainActivity extends AppCompatActivity implements
                     case R.id.nav_archive:
                         loaderId = 3;
                         break;
+                    case R.id.nav_deleted:
+                        loaderId = 4;
+                        break;
                 }
                 navigationView.setCheckedItem(item.getItemId());
                 ToduleListFragment frag = ToduleListFragment.newInstance(loaderId);
@@ -277,17 +280,6 @@ public class MainActivity extends AppCompatActivity implements
         toduleAddFragment.setLabel(id);
     }
 
-    public void changeStatusBarColor(int resId){
-        Window window = getWindow();
-        // clear FLAG_TRANSLUCENT_STATUS flag:
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-
-        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-
-        // finally change the color
-        window.setStatusBarColor(ContextCompat.getColor(this, resId));
-    }
 
     @Override
     public void onActionModeStarted(ActionMode mode) {

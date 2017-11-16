@@ -12,7 +12,9 @@
     <string name="entry_updated">Updated</string>
     <string name="entry_done">Marked as done</string>
     <string name="entry_archived">Archived</string>
+    <string name="entry_unarchived">Unarchived</string>
     <string name="entry_deleted">Deleted</string>
+    <string name="entry_restored">Restored</string>
     <string name="undo_string">Undo</string>
     <string name="no_descrption">&lt; No description &gt;</string>
     <string name="reminder_intent_scheme">todule-reminder:</string>
@@ -35,4 +37,9 @@
     <string name="completed_title">Completed</string>
     <string name="archive_title">Archive</string>
     <string name="label_title">Labels</string>
+    <string name="deleted_title">Bin</string>
+    <string name="restore">Restore</string>
+    <string name="delete_forever">Delete forever</string>
+    <string name="empty_bin">Empty bin</string>
+    <string name="bin_emptied">Bin emptied</string>
 </resources>
