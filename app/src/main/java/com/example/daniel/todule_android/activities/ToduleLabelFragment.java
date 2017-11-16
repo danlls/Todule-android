@@ -31,7 +31,7 @@ import com.example.daniel.todule_android.provider.ToduleDBContract.TodoLabel;
  */
 
 public class ToduleLabelFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    private static final int LOADER_ID = 4;
+    private static final int LOADER_ID = 99;
     LabelAdapter lAdapter;
     MainActivity myActivity;
     OnLabelSelectedListener mCallback;
@@ -64,24 +64,20 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
         if(savedInstanceState != null) {
             selectedLabelId = savedInstanceState.getLong("selected_label_id", -1L);
         }
-        myActivity = (MainActivity) getActivity();
-        myActivity.getSupportActionBar().setTitle("Labels");
-        myActivity.hideSoftKeyboard(true);
+
         setHasOptionsMenu(true);
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         lAdapter = new LabelAdapter(getActivity(), null, 0);
         setListAdapter(lAdapter);
         getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+        myActivity = (MainActivity) getActivity();
+        myActivity.getSupportActionBar().setTitle("Labels");
+        myActivity.hideSoftKeyboard(true);
 
         if(selecting){
             setActivateOnItemClick(true);
@@ -92,7 +88,6 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
             labelTag.setText(R.string.none);
             getListView().addHeaderView(noLabel);
         }
-        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
