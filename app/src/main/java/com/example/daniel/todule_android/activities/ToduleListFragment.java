@@ -49,8 +49,8 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
     private CursorAdapter mAdapter;
     private MainActivity myActivity;
     private ListView listView;
-    private ScrollView emptyView;
     private SwipeRefreshLayout swipeContainer;
+    private SwipeRefreshLayout swipeContainerEmpty;
     private int loaderId;
     private LongSparseArray<Boolean> selectedIds;
 
@@ -94,10 +94,9 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
         }
 
         listView.setAdapter(mAdapter);
-        listView.setEmptyView(emptyView);
+        listView.setEmptyView(swipeContainerEmpty);
 
-        getActivity().getSupportLoaderManager().initLoader(loaderId, null, this);
-
+        myActivity.getSupportLoaderManager().initLoader(loaderId, null, this);
         myActivity.getSupportActionBar().setTitle(getTitle(loaderId));
 
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -128,10 +127,14 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list_view, container, false);
         listView = view.findViewById(android.R.id.list);
-        emptyView = view.findViewById(android.R.id.empty);
+
         setHasOptionsMenu(true);
+
         swipeContainer  = view.findViewById(R.id.swipe_container);
+        swipeContainerEmpty = view.findViewById(R.id.swipe_container_empty);
+
         swipeContainer.setOnRefreshListener(this);
+        swipeContainerEmpty.setOnRefreshListener(this);
         return view;
     }
 
@@ -201,6 +204,12 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
             @Override
             public void run() {
                 swipeContainer.setRefreshing(false);
+            }
+        });
+        swipeContainerEmpty.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeContainerEmpty.setRefreshing(false);
             }
         });
     }
