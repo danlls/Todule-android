@@ -1,7 +1,6 @@
 package com.example.daniel.todule_android.activities;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -17,6 +16,7 @@ import android.support.v4.util.LongSparseArray;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -28,7 +28,6 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.example.daniel.todule_android.R;
@@ -37,11 +36,14 @@ import com.example.daniel.todule_android.adapter.MainCursorAdapter;
 import com.example.daniel.todule_android.parcelable.LongSparseArrayBooleanParcelable;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
 
+import java.util.ArrayList;
+
 /**
  * Created by danieL on 8/1/2017.
  */
 
-public class ToduleListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener {
+public class ToduleListFragment extends ListFragment implements
+        LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener{
     private static final int INCOMPLETE_LOADER_ID = 1;
     private static final int COMPLETED_LOADER_ID = 2;
     private static final int ARCHIVE_LOADER_ID = 3;
@@ -53,6 +55,9 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
     private SwipeRefreshLayout swipeContainerEmpty;
     private int loaderId;
     private LongSparseArray<Boolean> selectedIds;
+
+    SearchView searchView;
+    String mCurFilter;
 
     public static ToduleListFragment newInstance(int id){
         ToduleListFragment f = new ToduleListFragment();
@@ -149,49 +154,48 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
         CursorLoader cursorLoader;
         Uri ENTRY_URI = TodoEntry.CONTENT_URI;
         String select = "";
-        String[] selectionArgs = {};
+        ArrayList<String> selectionArgs = new ArrayList<String>();
 
         switch(loaderId){
             case INCOMPLETE_LOADER_ID:
                 select = "(" + TodoEntry.COLUMN_NAME_TITLE + " NOTNULL) AND ("
                         + TodoEntry.COLUMN_NAME_TASK_DONE + " == ?) AND ("
                         + TodoEntry.COLUMN_NAME_DELETED + " == ?)";
-                selectionArgs = new String []{
-                        String.valueOf(TodoEntry.TASK_NOT_COMPLETED),
-                        String.valueOf(TodoEntry.TASK_NOT_DELETED)
-                };
+                selectionArgs.add(String.valueOf(TodoEntry.TASK_NOT_COMPLETED));
+                selectionArgs.add(String.valueOf(TodoEntry.TASK_NOT_DELETED));
                 break;
             case COMPLETED_LOADER_ID:
                 select = "(" + TodoEntry.COLUMN_NAME_TITLE + " NOTNULL) AND ("
                         + TodoEntry.COLUMN_NAME_TASK_DONE + " == ?) AND ("
                         + TodoEntry.COLUMN_NAME_ARCHIVED + " == ?) AND ("
                         + TodoEntry.COLUMN_NAME_DELETED + " == ?)";
-                selectionArgs = new String[] {
-                        String.valueOf(TodoEntry.TASK_COMPLETED),
-                        String.valueOf(TodoEntry.TASK_NOT_ARCHIVED),
-                        String.valueOf(TodoEntry.TASK_NOT_DELETED)
-                };
+                selectionArgs.add(String.valueOf(TodoEntry.TASK_COMPLETED));
+                selectionArgs.add(String.valueOf(TodoEntry.TASK_NOT_ARCHIVED));
+                selectionArgs.add(String.valueOf(TodoEntry.TASK_NOT_DELETED));
                 break;
             case ARCHIVE_LOADER_ID:
                 select = "(" + TodoEntry.COLUMN_NAME_TITLE + " NOTNULL) AND ("
                         + TodoEntry.COLUMN_NAME_ARCHIVED + " == ?) AND ("
                         + TodoEntry.COLUMN_NAME_DELETED + " == ?)";
-                selectionArgs = new String []{
-                        String.valueOf(TodoEntry.TASK_ARCHIVED),
-                        String.valueOf(TodoEntry.TASK_NOT_DELETED)
-                };
+                selectionArgs.add(String.valueOf(TodoEntry.TASK_ARCHIVED));
+                selectionArgs.add(String.valueOf(TodoEntry.TASK_NOT_DELETED));
                 break;
             case DELETED_LOADER_ID:
                 select = "(" + TodoEntry.COLUMN_NAME_TITLE + " NOTNULL) AND ("
                     + TodoEntry.COLUMN_NAME_DELETED + " == ?)";
-                selectionArgs = new String[]{
-                        String.valueOf(TodoEntry.TASK_DELETED)
-                };
+                selectionArgs.add(String.valueOf(TodoEntry.TASK_DELETED));
+                break;
             default:
                 break;
         }
+        if (mCurFilter != null){
+            select += " AND (" + TodoEntry.COLUMN_NAME_TITLE + " LIKE ?)";
+            selectionArgs.add("%" + mCurFilter + "%");
+        }
+        String [] selectionArgsArray = new String[selectionArgs.size()];
+        selectionArgs.toArray(selectionArgsArray);
         cursorLoader = new CursorLoader(getActivity(), ENTRY_URI,
-                TodoEntry.PROJECTION_ALL, select, selectionArgs, TodoEntry.SORT_ORDER_DEFAULT);
+                TodoEntry.PROJECTION_ALL, select, selectionArgsArray, TodoEntry.SORT_ORDER_DEFAULT);
         return cursorLoader;
     }
 
@@ -480,6 +484,16 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
         if(loaderId == DELETED_LOADER_ID){
             inflater.inflate(R.menu.menu_fragment_bin, menu);
         }
+
+        // Place an action bar item for searching.
+        MenuItem item = menu.add("Search");
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+        searchView = new SearchView(myActivity);
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+
+        searchView.setOnQueryTextListener(this);
+        item.setActionView(searchView);
         super.onCreateOptionsMenu(menu, inflater);
 
     }
@@ -493,5 +507,19 @@ public class ToduleListFragment extends ListFragment implements LoaderManager.Lo
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean onQueryTextChange(String newText) {
+        // Called when the action bar search text has changed.  Update
+        // the search filter, and restart the loader to do a new query
+        // with this filter.
+        mCurFilter = !TextUtils.isEmpty(newText) ? newText : null;
+        getLoaderManager().restartLoader(loaderId, null, this);
+        return true;
+    }
+
+    @Override public boolean onQueryTextSubmit(String query) {
+        myActivity.hideSoftKeyboard(true);
+        return true;
     }
 }
