@@ -37,6 +37,7 @@ import com.example.daniel.todule_android.parcelable.LongSparseArrayBooleanParcel
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by danieL on 8/1/2017.
@@ -325,6 +326,20 @@ public class ToduleListFragment extends ListFragment implements
         }
     };
 
+    private String constructPlaceholders(int len) {
+        if (len < 1) {
+            // It will lead to an invalid query anyway ..
+            throw new RuntimeException("No placeholders");
+        } else {
+            StringBuilder sb = new StringBuilder(len * 2 - 1);
+            sb.append("?");
+            for (int i = 1; i < len; i++) {
+                sb.append(",?");
+            }
+            return sb.toString();
+        }
+    }
+
     private void softDeleteSelectedItems(){
         final ContentResolver resolver = getContext().getContentResolver();
         int size = selectedIds.size();
@@ -336,8 +351,11 @@ public class ToduleListFragment extends ListFragment implements
         ContentValues cv = new ContentValues();
         cv.put(TodoEntry.COLUMN_NAME_DELETED, TodoEntry.TASK_DELETED);
         cv.put(TodoEntry.COLUMN_NAME_DELETION_DATE, System.currentTimeMillis());
-        final String select = TodoEntry._ID + " IN(?)";
-        final String[] selectionArgs = new String[] {TextUtils.join(", ", mArray)};
+        final String select = TodoEntry._ID + " IN(" + constructPlaceholders(mArray.length)+ ")";
+        final String[] selectionArgs = new String[mArray.length];
+        for (int i =0; i< mArray.length; i++){
+            selectionArgs[i] = String.valueOf(mArray[i]);
+        }
         int count = resolver.update(TodoEntry.CONTENT_URI, cv, select, selectionArgs);
         Snackbar mySnackbar = Snackbar.make(getView(), String.valueOf(count) + " " + getString(R.string.entry_deleted), Snackbar.LENGTH_LONG);
         mySnackbar.setAction(R.string.undo_string, new View.OnClickListener(){
@@ -363,8 +381,11 @@ public class ToduleListFragment extends ListFragment implements
         ContentValues cv = new ContentValues();
         cv.put(TodoEntry.COLUMN_NAME_DELETED, TodoEntry.TASK_NOT_DELETED);
         cv.putNull(TodoEntry.COLUMN_NAME_DELETION_DATE);
-        final String select = TodoEntry._ID + " IN(?)";
-        final String[] selectionArgs = new String[] {TextUtils.join(", ", mArray)};
+        final String select = TodoEntry._ID + " IN(" + constructPlaceholders(mArray.length)+ ")";
+        final String[] selectionArgs = new String[mArray.length];
+        for (int i =0; i< mArray.length; i++){
+            selectionArgs[i] = String.valueOf(mArray[i]);
+        }
         int count = resolver.update(TodoEntry.CONTENT_URI, cv, select ,selectionArgs);
         Snackbar mySnackbar = Snackbar.make(getView(), String.valueOf(count)+ " " + getString(R.string.entry_restored), Snackbar.LENGTH_LONG);
         mySnackbar.setAction(R.string.undo_string, new View.OnClickListener(){
@@ -387,8 +408,11 @@ public class ToduleListFragment extends ListFragment implements
             long id = selectedIds.keyAt(i);
             mArray[i] = id;
         }
-        final String select = TodoEntry._ID + " IN(?)";
-        final String[] selectionArgs = new String[] {TextUtils.join(", ", mArray)};
+        final String select = TodoEntry._ID + " IN(" + constructPlaceholders(mArray.length)+ ")";
+        final String[] selectionArgs = new String[mArray.length];
+        for (int i =0; i< mArray.length; i++){
+            selectionArgs[i] = String.valueOf(mArray[i]);
+        }
         int count = resolver.delete(TodoEntry.CONTENT_URI , select, selectionArgs);
         Toast.makeText(myActivity, count + " " + getString(R.string.entry_deleted), Toast.LENGTH_SHORT).show();
     }
@@ -403,8 +427,11 @@ public class ToduleListFragment extends ListFragment implements
         }
         ContentValues cv = new ContentValues();
         cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, TodoEntry.TASK_ARCHIVED);
-        final String select = TodoEntry._ID + " IN(?)";
-        final String[] selectionArgs = new String[] {TextUtils.join(", ", mArray)};
+        final String select = TodoEntry._ID + " IN(" + constructPlaceholders(mArray.length)+ ")";
+        final String[] selectionArgs = new String[mArray.length];
+        for (int i =0; i< mArray.length; i++){
+            selectionArgs[i] = String.valueOf(mArray[i]);
+        }
         int count = resolver.update(TodoEntry.CONTENT_URI, cv, select, selectionArgs);
         Snackbar mySnackbar = Snackbar.make(getView(), String.valueOf(count)+ " " + getString(R.string.entry_archived), Snackbar.LENGTH_LONG);
         mySnackbar.setAction(R.string.undo_string, new View.OnClickListener(){
@@ -428,8 +455,11 @@ public class ToduleListFragment extends ListFragment implements
         }
         ContentValues cv = new ContentValues();
         cv.put(TodoEntry.COLUMN_NAME_ARCHIVED, TodoEntry.TASK_NOT_ARCHIVED);
-        final String select = TodoEntry._ID + " IN(?)";
-        final String[] selectionArgs = new String[] {TextUtils.join(", ", mArray)};
+        final String select = TodoEntry._ID + " IN(" + constructPlaceholders(mArray.length)+ ")";
+        final String[] selectionArgs = new String[mArray.length];
+        for (int i =0; i< mArray.length; i++){
+            selectionArgs[i] = String.valueOf(mArray[i]);
+        }
         int count = resolver.update(TodoEntry.CONTENT_URI, cv, select, selectionArgs);
         Snackbar mySnackbar = Snackbar.make(getView(), String.valueOf(count) + " " + getString(R.string.entry_unarchived), Snackbar.LENGTH_LONG);
         mySnackbar.setAction(R.string.undo_string, new View.OnClickListener(){
