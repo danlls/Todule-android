@@ -15,7 +15,17 @@
 
         <!--  For Custom Action Mode Background Color/Drawable -->
         <item name="actionModeBackground">@color/colorAccent</item>
+        <item name="searchViewStyle">@style/AppTheme.SearchView</item>
 
+    </style>
+
+    <style name="AppTheme.SearchView" parent="Widget.AppCompat.SearchView">
+        <item name="searchIcon">@drawable/ic_search_white_24dp</item>
+        <item name="closeIcon">@drawable/ic_close_black_24dp</item>
+        <item name="queryBackground">@color/white</item>
+    </style>
+
+    <style name="AppTheme.Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
     </style>
 
 </resources>
