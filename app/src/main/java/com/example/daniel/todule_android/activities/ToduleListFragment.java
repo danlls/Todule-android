@@ -37,7 +37,6 @@ import com.example.daniel.todule_android.parcelable.LongSparseArrayBooleanParcel
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by danieL on 8/1/2017.

@@ -24,13 +24,21 @@
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:layout_alignParentStart="true"
-            android:layout_toRightOf="@+id/completed_date_text"/>
+            android:layout_toStartOf="@+id/completed_date_text"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/entry_label"
+            android:layout_below="@+id/title_text"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"/>
 
         <TextView android:id="@+id/description_text"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/title_text"
+            android:layout_below="@+id/entry_label"
             android:paddingBottom="10dp"
             android:maxLines="1"
             android:ellipsize="end"

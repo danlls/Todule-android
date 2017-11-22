@@ -1,8 +1,10 @@
 package com.example.daniel.todule_android.adapter;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.text.format.DateUtils;
@@ -69,6 +71,23 @@ public class HistoryAdapter extends CursorAdapter{
         } else {
             holder.checkbox.setVisibility(View.GONE);
         }
+        if (!cursor.isNull(cursor.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_LABEL))){
+            Long labelId = cursor.getLong(cursor.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_LABEL));
+            Uri labelUri = ContentUris.withAppendedId(ToduleDBContract.TodoLabel.CONTENT_ID_URI_BASE, labelId);
+            Cursor cr = context.getContentResolver().query(labelUri, ToduleDBContract.TodoLabel.PROJECTION_ALL, null, null, ToduleDBContract.TodoLabel.SORT_ORDER_DEFAULT);
+
+            cr.moveToFirst();
+            String labelText = cr.getString(cr.getColumnIndexOrThrow(ToduleDBContract.TodoLabel.COLUMN_NAME_TAG));
+            int textColor = cr.getInt(cr.getColumnIndexOrThrow(ToduleDBContract.TodoLabel.COLUMN_NAME_TEXT_COLOR));
+            int color = cr.getInt(cr.getColumnIndexOrThrow(ToduleDBContract.TodoLabel.COLUMN_NAME_COLOR));
+            holder.label.setText(labelText);
+            holder.label.setTextColor(textColor);
+            holder.label.setBackgroundColor(color);
+            holder.label.setVisibility(View.VISIBLE);
+            cr.close();
+        } else {
+            holder.label.setVisibility(View.GONE);
+        }
 
     }
 
@@ -80,6 +99,7 @@ public class HistoryAdapter extends CursorAdapter{
         holder.description = rowView.findViewById(R.id.description_text);
         holder.completed = rowView.findViewById(R.id.completed_date_text);
         holder.checkbox = rowView.findViewById(R.id.checkbox);
+        holder.label = rowView.findViewById(R.id.entry_label);
         rowView.setTag(holder);
         return rowView;
     }
@@ -92,6 +112,7 @@ public class HistoryAdapter extends CursorAdapter{
         TextView title;
         TextView description;
         TextView completed;
+        TextView label;
         CheckBox checkbox;
     }
 }
