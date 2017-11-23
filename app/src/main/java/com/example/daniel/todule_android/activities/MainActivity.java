@@ -208,14 +208,17 @@ public class MainActivity extends AppCompatActivity implements
                     case R.id.nav_incomplete:
                         loaderId = 1;
                         break;
-                    case R.id.nav_completed:
+                    case R.id.nav_expired:
                         loaderId = 2;
                         break;
-                    case R.id.nav_archive:
+                    case R.id.nav_completed:
                         loaderId = 3;
                         break;
-                    case R.id.nav_deleted:
+                    case R.id.nav_archive:
                         loaderId = 4;
+                        break;
+                    case R.id.nav_deleted:
+                        loaderId = 5;
                         break;
                 }
                 navigationView.setCheckedItem(item.getItemId());

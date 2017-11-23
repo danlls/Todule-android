@@ -45,9 +45,10 @@ import java.util.ArrayList;
 public class ToduleListFragment extends ListFragment implements
         LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener{
     private static final int INCOMPLETE_LOADER_ID = 1;
-    private static final int COMPLETED_LOADER_ID = 2;
-    private static final int ARCHIVE_LOADER_ID = 3;
-    private static final int DELETED_LOADER_ID = 4;
+    private static final int EXPIRED_LOADER_ID = 2;
+    private static final int COMPLETED_LOADER_ID = 3;
+    private static final int ARCHIVE_LOADER_ID = 4;
+    private static final int DELETED_LOADER_ID = 5;
     private CursorAdapter mAdapter;
     private MainActivity myActivity;
     private ListView listView;
@@ -85,8 +86,9 @@ public class ToduleListFragment extends ListFragment implements
         myActivity = (MainActivity) getActivity();
         switch(loaderId){
             case INCOMPLETE_LOADER_ID:
-                mAdapter = new MainCursorAdapter(getActivity(), null, 0);
                 myActivity.fabVisibility(true);
+            case EXPIRED_LOADER_ID:
+                mAdapter = new MainCursorAdapter(getActivity(), null, 0);
                 break;
             case COMPLETED_LOADER_ID:
             case ARCHIVE_LOADER_ID:
@@ -160,7 +162,18 @@ public class ToduleListFragment extends ListFragment implements
             case INCOMPLETE_LOADER_ID:
                 select = "(" + TodoEntry.COLUMN_NAME_TITLE + " NOTNULL) AND ("
                         + TodoEntry.COLUMN_NAME_TASK_DONE + " == ?) AND ("
+                        + TodoEntry.COLUMN_NAME_DELETED + " == ?) AND ("
+                        + TodoEntry.COLUMN_NAME_DUE_DATE + " > ?)";
+                selectionArgs.add(String.valueOf(TodoEntry.TASK_NOT_COMPLETED));
+                selectionArgs.add(String.valueOf(TodoEntry.TASK_NOT_DELETED));
+                selectionArgs.add(String.valueOf(System.currentTimeMillis()));
+                break;
+            case EXPIRED_LOADER_ID:
+                select = "(" + TodoEntry.COLUMN_NAME_TITLE + " NOTNULL) AND ("
+                        + TodoEntry.COLUMN_NAME_DUE_DATE + " < ?) AND ("
+                        + TodoEntry.COLUMN_NAME_TASK_DONE + " == ?) AND ("
                         + TodoEntry.COLUMN_NAME_DELETED + " == ?)";
+                selectionArgs.add(String.valueOf(System.currentTimeMillis()));
                 selectionArgs.add(String.valueOf(TodoEntry.TASK_NOT_COMPLETED));
                 selectionArgs.add(String.valueOf(TodoEntry.TASK_NOT_DELETED));
                 break;
@@ -236,6 +249,8 @@ public class ToduleListFragment extends ListFragment implements
         switch(id){
             case INCOMPLETE_LOADER_ID:
                 return getContext().getString(R.string.todule_title);
+            case EXPIRED_LOADER_ID:
+                return getContext().getString(R.string.expired_title);
             case COMPLETED_LOADER_ID:
                 return getContext().getString(R.string.completed_title);
             case ARCHIVE_LOADER_ID:
@@ -276,7 +291,7 @@ public class ToduleListFragment extends ListFragment implements
 
         @Override
         public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-            if(loaderId == INCOMPLETE_LOADER_ID){
+            if(loaderId == INCOMPLETE_LOADER_ID || loaderId == EXPIRED_LOADER_ID){
                 // remove edit action
                 menu.removeItem(R.id.action_edit);
             }
@@ -498,6 +513,8 @@ public class ToduleListFragment extends ListFragment implements
         switch(id){
             case INCOMPLETE_LOADER_ID:
                 return R.menu.menu_entry_incomplete;
+            case EXPIRED_LOADER_ID:
+                return R.menu.menu_entry_expired;
             case COMPLETED_LOADER_ID:
                 return R.menu.menu_entry_completed;
             case ARCHIVE_LOADER_ID:

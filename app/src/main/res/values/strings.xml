@@ -38,6 +38,7 @@
     <string name="archive_title">Archive</string>
     <string name="label_title">Labels</string>
     <string name="deleted_title">Bin</string>
+    <string name="expired_title">Expired</string>
     <string name="restore">Restore</string>
     <string name="delete_forever">Delete forever</string>
     <string name="empty_bin">Empty bin</string>
