@@ -1,5 +1,7 @@
 package com.example.daniel.todule_android.activities;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -10,19 +12,25 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.util.LongSparseArray;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.adapter.LabelAdapter;
+import com.example.daniel.todule_android.parcelable.LongSparseArrayBooleanParcelable;
+import com.example.daniel.todule_android.provider.ToduleDBContract;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoLabel;
 
 
@@ -37,6 +45,7 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
     OnLabelSelectedListener mCallback;
     Long selectedLabelId = null;
     boolean selecting;
+    private LongSparseArray<Boolean> selectedIds;
 
     public static ToduleLabelFragment newInstance(boolean select, Long selected_label_id) {
 
@@ -63,6 +72,11 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
         }
         if(savedInstanceState != null) {
             selectedLabelId = savedInstanceState.getLong("selected_label_id", -1L);
+            selectedIds = savedInstanceState.getParcelable("myLongSparseBooleanArray");
+        }
+
+        if (selectedIds == null){
+            selectedIds = new LongSparseArray<>();
         }
 
         setHasOptionsMenu(true);
@@ -78,6 +92,9 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
         myActivity = (MainActivity) getActivity();
         myActivity.getSupportActionBar().setTitle("Labels");
         myActivity.hideSoftKeyboard(true);
+        myActivity.fabVisibility(false);
+
+        ListView listView = getListView();
 
         if(selecting){
             setActivateOnItemClick(true);
@@ -86,7 +103,10 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
             View noLabel =  View.inflate(getContext(), R.layout.fragment_label_item, null);
             TextView labelTag = noLabel.findViewById(R.id.label_tag);
             labelTag.setText(R.string.none);
-            getListView().addHeaderView(noLabel);
+            listView.addHeaderView(noLabel);
+        } else {
+            listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+            listView.setMultiChoiceModeListener(myMultiChoiceModeListener);
         }
     }
 
@@ -101,6 +121,8 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
         super.onSaveInstanceState(outState);
         if(selecting) {
             outState.putLong("selected_label_id", selectedLabelId);
+        } else {
+            outState.putParcelable("myLongSparseBooleanArray", new LongSparseArrayBooleanParcelable(selectedIds));
         }
     }
 
@@ -228,5 +250,85 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
         return -1;
     }
 
+    private AbsListView.MultiChoiceModeListener myMultiChoiceModeListener = new AbsListView.MultiChoiceModeListener() {
+        @Override
+        public void onItemCheckedStateChanged(ActionMode actionMode, int i, long l, boolean b) {
+            if(b){
+                selectedIds.put(l, b);
+            } else {
+                selectedIds.remove(l);
+            }
+            actionMode.setTitle(selectedIds.size() + " selected");
+        }
 
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            MenuInflater inflater = actionMode.getMenuInflater();
+            inflater.inflate(R.menu.menu_action_mode_label, menu);
+
+            lAdapter.setShowCheckbox(true);
+            actionMode.setTitle(selectedIds.size() + " selected");
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            switch(menuItem.getItemId()){
+                case R.id.action_delete:
+                    deleteSelectedLabels();
+                    actionMode.finish();
+                    return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode actionMode) {
+            selectedIds.clear();
+            lAdapter.setShowCheckbox(false);
+        }
+    };
+
+    private void deleteSelectedLabels(){
+        ContentResolver resolver = getContext().getContentResolver();
+        int size = selectedIds.size();
+        Long[] mArray = new Long[size];
+        for (int i = 0; i < size; i++) {
+            long id = selectedIds.keyAt(i);
+            mArray[i] = id;
+        }
+        // Update affected entries by label deletion
+        ContentValues cv = new ContentValues();
+        cv.putNull(ToduleDBContract.TodoEntry.COLUMN_NAME_LABEL);
+        String select = ToduleDBContract.TodoEntry.COLUMN_NAME_LABEL +  " IN(" + constructPlaceholders(mArray.length)+ ")";
+        String[] selectionArgs = new String[mArray.length];
+        for (int i =0; i< mArray.length; i++){
+            selectionArgs[i] = String.valueOf(mArray[i]);
+        }
+        resolver.update(ToduleDBContract.TodoEntry.CONTENT_URI, cv, select ,selectionArgs);
+
+        // Delete label from db
+        select = TodoLabel._ID + " IN(" + constructPlaceholders(mArray.length)+ ")";
+        int count = resolver.delete(TodoLabel.CONTENT_URI, select, selectionArgs);
+        Toast.makeText(myActivity, String.valueOf(count) + " label deleted", Toast.LENGTH_SHORT).show();
+    }
+
+    private String constructPlaceholders(int len) {
+        if (len < 1) {
+            // It will lead to an invalid query anyway ..
+            throw new RuntimeException("No placeholders");
+        } else {
+            StringBuilder sb = new StringBuilder(len * 2 - 1);
+            sb.append("?");
+            for (int i = 1; i < len; i++) {
+                sb.append(",?");
+            }
+            return sb.toString();
+        }
+    }
 }
