@@ -107,6 +107,17 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
         } else {
             listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
             listView.setMultiChoiceModeListener(myMultiChoiceModeListener);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    ToduleLabelAddFragment f = ToduleLabelAddFragment.newInstance(l);
+                    myActivity.getSupportFragmentManager().beginTransaction()
+                            .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                            .replace(R.id.fragment_container, f)
+                            .addToBackStack(null)
+                            .commit();
+                }
+            });
         }
     }
 
@@ -186,9 +197,10 @@ public class ToduleLabelFragment extends ListFragment implements LoaderManager.L
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.label_new:
+                ToduleLabelAddFragment f = ToduleLabelAddFragment.newInstance(null);
                 myActivity.getSupportFragmentManager().beginTransaction()
                         .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
-                        .replace(R.id.fragment_container, new ToduleLabelAddFragment())
+                        .replace(R.id.fragment_container, f)
                         .addToBackStack(null)
                         .commit();
                 return true;

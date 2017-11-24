@@ -1,6 +1,8 @@
 package com.example.daniel.todule_android.activities;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,18 +37,52 @@ public class ToduleLabelAddFragment extends Fragment {
     TextView preview_text;
     EditText tag_edit;
     Integer selected_color;
+    String label_text;
+    Integer label_text_color;
+    Long labelId;
+
+    public static ToduleLabelAddFragment newInstance(Long id) {
+
+        Bundle args = new Bundle();
+        if (id != null){
+            args.putLong("label_id", id);
+        }
+        ToduleLabelAddFragment fragment = new ToduleLabelAddFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        if(args.containsKey("label_id")){
+            labelId = args.getLong("label_id");
+        }
+        if (savedInstanceState != null){
+            selected_color = savedInstanceState.getInt("selected_color");
+            labelId = savedInstanceState.getLong("label_id");
+        }
+        if(labelId != null){
+            Uri labelUri = ContentUris.withAppendedId(ToduleDBContract.TodoLabel.CONTENT_ID_URI_BASE, labelId);
+            Cursor cr = getContext().getContentResolver().query(labelUri, null, null, null, null);
+            cr.moveToFirst();
+            selected_color = cr.getInt(cr.getColumnIndexOrThrow(ToduleDBContract.TodoLabel.COLUMN_NAME_COLOR));
+            label_text = cr.getString(cr.getColumnIndexOrThrow(ToduleDBContract.TodoLabel.COLUMN_NAME_TAG));
+            label_text_color = cr.getInt(cr.getColumnIndexOrThrow(ToduleDBContract.TodoLabel.COLUMN_NAME_TEXT_COLOR));
+            cr.close();
+        }
+
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         myActivity = (MainActivity) getActivity();
-        myActivity.getSupportActionBar().setTitle("New label");
+
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_label_add, container, false);
 
-        if (savedInstanceState != null){
-            selected_color = savedInstanceState.getInt("selected_color");
-        }
         tag_edit = view.findViewById(R.id.tag_edit);
         preview_text = view.findViewById(R.id.preview_label);
 
@@ -65,8 +101,20 @@ public class ToduleLabelAddFragment extends Fragment {
             }
         });
 
-
         cpView = view.findViewById(R.id.color_picker_view);
+
+        if(labelId == null){
+            myActivity.getSupportActionBar().setTitle("New label");
+        } else {
+            myActivity.getSupportActionBar().setTitle("Edit label");
+        }
+
+        if(label_text != null){
+            tag_edit.setText(label_text);
+        }
+        if(label_text_color != null){
+            preview_text.setTextColor(label_text_color);
+        }
 
         if(selected_color == null){
             // Set default
@@ -113,6 +161,7 @@ public class ToduleLabelAddFragment extends Fragment {
         if(selected_color != null) {
             outState.putInt("selected_color", selected_color);
         }
+        outState.putLong("label_id", labelId);
     }
 
     @Override
@@ -130,8 +179,15 @@ public class ToduleLabelAddFragment extends Fragment {
                 cv.put(ToduleDBContract.TodoLabel.COLUMN_NAME_TAG, preview_text.getText().toString());
                 cv.put(ToduleDBContract.TodoLabel.COLUMN_NAME_COLOR, cpView.getSelectedColor());
                 cv.put(ToduleDBContract.TodoLabel.COLUMN_NAME_TEXT_COLOR, preview_text.getCurrentTextColor());
-                Uri itemUri = getContext().getContentResolver().insert(ToduleDBContract.TodoLabel.CONTENT_URI, cv);
-                Toast.makeText(getContext(), "Label '" + preview_text.getText().toString() + "' created", Toast.LENGTH_SHORT).show();
+
+                if (labelId == null){
+                    getContext().getContentResolver().insert(ToduleDBContract.TodoLabel.CONTENT_URI, cv);
+                    Toast.makeText(myActivity, "Label '" + tag_edit.getText().toString() + "' created", Toast.LENGTH_SHORT).show();
+                } else {
+                    Uri itemUri = ContentUris.withAppendedId(ToduleDBContract.TodoLabel.CONTENT_ID_URI_BASE, labelId);
+                    getContext().getContentResolver().update(itemUri, cv, null, null);
+                    Toast.makeText(myActivity, "Label updated", Toast.LENGTH_SHORT).show();
+                }
                 getActivity().onBackPressed();
                 return true;
         }
