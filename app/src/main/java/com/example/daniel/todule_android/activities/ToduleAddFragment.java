@@ -33,6 +33,7 @@ import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.adapter.LabelAdapter;
 import com.example.daniel.todule_android.provider.ToduleDBContract;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
+import com.example.daniel.todule_android.utilities.NotificationHelper;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -329,7 +330,7 @@ public class ToduleAddFragment extends Fragment{
             Toast.makeText(myActivity, getString(R.string.entry_updated) + ": " + title_text, Toast.LENGTH_SHORT).show();
         }
         // Reminder set at one hour before due_date
-//        myActivity.setReminder(entryUri, due_date - 60 * 60 * 1000);
+        NotificationHelper.setReminder(getContext(), entryUri, due_date - 60 * 60 * 1000);
     }
 
     private boolean validateInputs() {

@@ -104,21 +104,21 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         // Check if activity is launched with todule_id (From notification)
-//        final long entryId = getIntent().getLongExtra("todule_id", -1L);
-//        if(entryId != -1L){
-//            new Handler().postDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-//                    ToduleDetailFragment frag = ToduleDetailFragment.newInstance(entryId);
-//                    getSupportFragmentManager().beginTransaction()
-//                            .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
-//                            .replace(R.id.fragment_container, frag)
-//                            .addToBackStack(null)
-//                            .commit();
-//                }
-//            }, 500);
-//
-//        }
+        final long entryId = getIntent().getLongExtra("todule_id", -1L);
+        if(entryId != -1L){
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ToduleDetailFragment frag = ToduleDetailFragment.newInstance(entryId);
+                    getSupportFragmentManager().beginTransaction()
+                            .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                            .replace(R.id.fragment_container, frag)
+                            .addToBackStack(null)
+                            .commit();
+                }
+            }, 500);
+
+        }
 
         // default fragment
         if (savedInstanceState == null){
@@ -246,35 +246,9 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
-    public PendingIntent initReminderPendingIntent(Uri itemUri){
-        Cursor cr = getContentResolver().query(itemUri, ToduleDBContract.TodoEntry.PROJECTION_ALL, null, null, ToduleDBContract.TodoEntry.SORT_ORDER_DEFAULT);
-        cr.moveToFirst();
-        long itemId = Long.valueOf(itemUri.getLastPathSegment());
-        String title = cr.getString(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_TITLE));
-        long dueDate = cr.getLong(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_DUE_DATE));
-        String dueDateString = DateTimeUtils.dateTimeDiff(dueDate);
 
-        Intent intent = new Intent(context, NotificationReceiver.class);
-        intent.setData(Uri.parse(R.string.reminder_intent_scheme + String.valueOf(itemId)));
-        intent.putExtra("todule_id", itemId);
-        intent.putExtra("todule_title", title);
-        intent.putExtra("todule_due_date", dueDateString);
-        PendingIntent sender = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        cr.close();
-        return sender;
-    }
 
-    public void setReminder(Uri itemUri, long datetimeInMillis){
-        PendingIntent pIntent = initReminderPendingIntent(itemUri);
-        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-        am.set(AlarmManager.RTC_WAKEUP, datetimeInMillis, pIntent);
-    }
 
-    public void cancelReminder(Uri itemUri){
-        PendingIntent pIntent = initReminderPendingIntent(itemUri);
-        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-        am.cancel(pIntent);
-    }
 
     @Override
     public void onLabelSelected(long id) {

@@ -112,7 +112,7 @@ public class ToduleListFragment extends ListFragment implements
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ToduleDetailFragment frag = ToduleDetailFragment.newInstance(l, loaderId);
+                ToduleDetailFragment frag = ToduleDetailFragment.newInstance(l);
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
                         .replace(R.id.fragment_container, frag, "detail_frag")
