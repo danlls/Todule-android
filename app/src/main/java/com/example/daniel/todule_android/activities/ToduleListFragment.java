@@ -533,7 +533,8 @@ public class ToduleListFragment extends ListFragment implements
 
         // Place an action bar item for searching.
         MenuItem item = menu.add("Search");
-        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        item.setIcon(R.drawable.ic_search_white_24dp);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM|MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
 
         searchView = new SearchView(myActivity);
         searchView.setMaxWidth(Integer.MAX_VALUE);
