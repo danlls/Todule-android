@@ -11,6 +11,9 @@ import android.net.Uri;
 import android.text.TextUtils;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoLabel;
+import com.example.daniel.todule_android.provider.ToduleDBContract.TodoNotification;
+
+import org.w3c.dom.Text;
 
 /**
  * Created by danieL on 7/31/2017.
@@ -23,6 +26,8 @@ public class ToduleProvider extends ContentProvider{
     private static final int ENTRY_ID = 2;
     private static final int LABEL_LIST = 3;
     private static final int LABEL_ID = 4;
+    private static final int NOTIFICATION_LIST = 5;
+    private static final int NOTIFICATION_ID = 6;
 
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -31,6 +36,8 @@ public class ToduleProvider extends ContentProvider{
         sUriMatcher.addURI("com.example.todule.provider", "todo_entry/#", ENTRY_ID);
         sUriMatcher.addURI("com.example.todule.provider", "todo_label", LABEL_LIST);
         sUriMatcher.addURI("com.example.todule.provider", "todo_label/#", LABEL_ID);
+        sUriMatcher.addURI("com.example.todule.provider", "todo_notification", NOTIFICATION_LIST);
+        sUriMatcher.addURI("com.example.todule.provider", "todo_notification/#", NOTIFICATION_ID);
     }
 
     private ToduleDBHelper tOpenHelper;
@@ -70,6 +77,16 @@ public class ToduleProvider extends ContentProvider{
                 builder.setTables(TodoLabel.TABLE_NAME);
                 builder.appendWhere("_ID = " + uri.getLastPathSegment());
                 break;
+            case NOTIFICATION_LIST:
+                builder.setTables(TodoNotification.TABLE_NAME);
+                if (TextUtils.isEmpty(sortOrder)) {
+                    sortOrder = TodoEntry.SORT_ORDER_DEFAULT;
+                }
+                break;
+            case NOTIFICATION_ID:
+                builder.setTables(TodoNotification.TABLE_NAME);
+                builder.appendWhere("_ID = " + uri.getLastPathSegment());
+                break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -96,6 +113,10 @@ public class ToduleProvider extends ContentProvider{
                 return TodoLabel.CONTENT_TYPE;
             case LABEL_ID:
                 return TodoLabel.CONTENT_ITEM_TYPE;
+            case NOTIFICATION_LIST:
+                return TodoNotification.CONTENT_TYPE;
+            case NOTIFICATION_ID:
+                return TodoNotification.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
@@ -110,6 +131,9 @@ public class ToduleProvider extends ContentProvider{
                 break;
             case LABEL_LIST:
                 id = db.insert(TodoLabel.TABLE_NAME, null, values);
+                break;
+            case NOTIFICATION_LIST:
+                id = db.insert(TodoNotification.TABLE_NAME, null, values);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported URI for insertion: " + uri);
@@ -145,6 +169,17 @@ public class ToduleProvider extends ContentProvider{
                     where += " AND " + selection;
                 }
                 count = db.delete(TodoLabel.TABLE_NAME, where, selectionArgs);
+                break;
+            case NOTIFICATION_LIST:
+                count = db.delete(TodoNotification.TABLE_NAME, selection, selectionArgs);
+                break;
+            case NOTIFICATION_ID:
+                idStr = uri.getLastPathSegment();
+                where = TodoNotification._ID + " = " + idStr;
+                if (!TextUtils.isEmpty(selection)) {
+                    where += " AND " + selection;
+                }
+                count = db.delete(TodoNotification.TABLE_NAME, where, selectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
@@ -182,6 +217,18 @@ public class ToduleProvider extends ContentProvider{
                     where += " AND " + selection;
                 }
                 count = db.update(TodoLabel.TABLE_NAME, values, where,
+                        selectionArgs);
+                break;
+            case NOTIFICATION_LIST:
+                count = db.update(TodoNotification.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case NOTIFICATION_ID:
+                idStr = uri.getLastPathSegment();
+                where = TodoNotification._ID + " = " + idStr;
+                if (!TextUtils.isEmpty(selection)) {
+                    where += " AND " + selection;
+                }
+                count = db.update(TodoNotification.TABLE_NAME, values, where,
                         selectionArgs);
                 break;
             default:

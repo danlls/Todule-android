@@ -77,4 +77,19 @@ public final class ToduleDBContract {
         public static final String SORT_ORDER_DEFAULT = _ID + " DESC";
 
     }
+
+    public static final class TodoNotification implements BaseColumns {
+
+        public static final String TABLE_NAME = "todo_notification";
+        public static final String COLUMN_NAME_TODULE_ID = "todule_id";
+        public static final String COLUMN_NAME_REMINDER_TIME = "reminder_time";
+
+        public static final Uri CONTENT_URI = Uri.parse(SCHEME + AUTHORITY + SLASH + TABLE_NAME);
+        public static final Uri CONTENT_ID_URI_BASE = Uri.parse(SCHEME + AUTHORITY + SLASH + TABLE_NAME + SLASH);
+
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/vnd.com.example.todule.todo_notification";
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/vnd.com.example.todule.todo_notification";
+        public static final String[] PROJECTION_ALL = {_ID, COLUMN_NAME_TODULE_ID, COLUMN_NAME_REMINDER_TIME};
+        public static final String SORT_ORDER_DEFAULT = COLUMN_NAME_REMINDER_TIME + " ASC";
+    }
 }

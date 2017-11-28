@@ -36,15 +36,16 @@ import com.example.daniel.todule_android.utilities.DateTimeUtils;
 public class ToduleDetailFragment extends Fragment {
     MainActivity myActivity;
     private Long entryId;
-    private int loaderId;
+    int taskDone;
+    int taskArchived;
+    int taskDeleted;
     String title;
 
-    public static ToduleDetailFragment newInstance(long id, int loader) {
+    public static ToduleDetailFragment newInstance(long id) {
         ToduleDetailFragment f= new ToduleDetailFragment();
 
         Bundle args = new Bundle();
         args.putLong("entry_id", id);
-        args.putInt("loader_id", loader);
         f.setArguments(args);
         return f;
     }
@@ -54,7 +55,6 @@ public class ToduleDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         myActivity = (MainActivity) getActivity();
         entryId = getArguments().getLong("entry_id");
-        loaderId = getArguments().getInt("loader_id");
         setHasOptionsMenu(true);
     }
 
@@ -85,7 +85,9 @@ public class ToduleDetailFragment extends Fragment {
         } else{
             labelId = cr.getLong(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_LABEL));
         }
-        int taskStatus = cr.getInt(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_TASK_DONE));
+        taskDone = cr.getInt(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_TASK_DONE));
+        taskArchived = cr.getInt(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_ARCHIVED));
+        taskDeleted = cr.getInt(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_DELETED));
         cr.close();
 
         titleView.setText(title);
@@ -100,7 +102,7 @@ public class ToduleDetailFragment extends Fragment {
         String countdownString =  DateTimeUtils.dateTimeDiff(dueDate);
         String completeDateString = DateTimeUtils.dateTimeDiff(completeDate);
 
-        if(taskStatus == ToduleDBContract.TodoEntry.TASK_NOT_COMPLETED){
+        if(taskDone == ToduleDBContract.TodoEntry.TASK_NOT_COMPLETED){
             if(dueDate < System.currentTimeMillis()) {
                 countdownView.setTextColor(ContextCompat.getColor(getContext(), R.color.red));
                 countdownView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_clear_black_18dp, 0, 0, 0);
@@ -174,8 +176,28 @@ public class ToduleDetailFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
-        inflater.inflate(ToduleListFragment.getMenuRes(loaderId), menu);
+        inflater.inflate(R.menu.menu_fragment_detail, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if(taskDeleted == ToduleDBContract.TodoEntry.TASK_DELETED){
+            menu.findItem(R.id.action_delete_forever).setVisible(true);
+            menu.findItem(R.id.action_restore).setVisible(true);
+        } else {
+            menu.findItem(R.id.action_soft_delete).setVisible(true);
+            if (taskDone == ToduleDBContract.TodoEntry.TASK_NOT_COMPLETED){
+                menu.findItem(R.id.action_edit).setVisible(true);
+            } else {
+                if(taskArchived == ToduleDBContract.TodoEntry.TASK_ARCHIVED){
+                    menu.findItem(R.id.action_unarchive).setVisible(true);
+                } else {
+                    menu.findItem(R.id.action_archive).setVisible(true);
+                }
+            }
+        }
     }
 
     @Override

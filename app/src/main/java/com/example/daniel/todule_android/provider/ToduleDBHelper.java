@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoLabel;
+import com.example.daniel.todule_android.provider.ToduleDBContract.TodoNotification;
 
 
 /**
@@ -41,9 +42,19 @@ public class ToduleDBHelper extends SQLiteOpenHelper{
     private static final String SQL_DELETE_LABELS =
             "DROP TABLE IF EXISTS " + TodoLabel.TABLE_NAME;
 
+    private static final String SQL_CREATE_NOTIFICATIONS =
+            "CREATE TABLE " + TodoNotification.TABLE_NAME + " (" +
+                    TodoNotification._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    TodoNotification.COLUMN_NAME_TODULE_ID + " INTEGER," +
+                    TodoNotification.COLUMN_NAME_REMINDER_TIME + " INTEGER" +
+                    ");";
+
+    private static final String SQL_DELETE_NOTIFICATIONS =
+            "DROP TABLE IF EXISTS " + TodoNotification.TABLE_NAME;
+
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 12;
+    public static final int DATABASE_VERSION = 13;
     public static final String DATABASE_NAME = "Todule.db";
 
     public ToduleDBHelper(Context context) {
@@ -52,6 +63,7 @@ public class ToduleDBHelper extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_ENTRIES);
         db.execSQL(SQL_CREATE_LABELS);
+        db.execSQL(SQL_CREATE_NOTIFICATIONS);
     }
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
@@ -73,12 +85,17 @@ public class ToduleDBHelper extends SQLiteOpenHelper{
             db.execSQL("ALTER TABLE " + TodoEntry.TABLE_NAME + " ADD COLUMN " + TodoEntry.COLUMN_NAME_DELETED + " INTEGER DEFAULT 0");
             db.execSQL("ALTER TABLE " + TodoEntry.TABLE_NAME + " ADD COLUMN " + TodoEntry.COLUMN_NAME_DELETION_DATE + " INTEGER DEFAULT NULL");
         }
+        if (oldVersion < 13){
+            db.execSQL(SQL_CREATE_NOTIFICATIONS);
+        }
         else {
             db.execSQL(SQL_DELETE_ENTRIES);
             db.execSQL(SQL_DELETE_LABELS);
+            db.execSQL(SQL_DELETE_NOTIFICATIONS);
 
             db.execSQL(SQL_CREATE_ENTRIES);
             db.execSQL(SQL_CREATE_LABELS);
+            db.execSQL(SQL_CREATE_NOTIFICATIONS);
         }
     }
 
