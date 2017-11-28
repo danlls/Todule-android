@@ -31,7 +31,7 @@ public class NotificationHelper {
 
         Intent intent = new Intent(context, NotificationReceiver.class);
         intent.setData(Uri.parse(R.string.reminder_intent_scheme + String.valueOf(itemId)));
-        intent.setAction("com.example.daniel.todule_android.VIEW_ENTRY");
+        intent.setAction("com.example.daniel.todule_android.REMINDER_NOTIFICATION");
         intent.putExtra("todule_id", itemId);
         intent.putExtra("todule_title", title);
         intent.putExtra("todule_due_date", dueDateString);
@@ -55,15 +55,9 @@ public class NotificationHelper {
         PendingIntent pIntent = initReminderPendingIntent(context, toduleUri);
         AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         am.cancel(pIntent);
+        String select = ToduleDBContract.TodoNotification.COLUMN_NAME_TODULE_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(toduleId)};
+        context.getContentResolver().delete(ToduleDBContract.TodoNotification.CONTENT_URI, select, selectionArgs);
     }
 
-    public static void cancelReminderByNotifId(Context context, long notifId){
-        Uri notifUri = ContentUris.withAppendedId(ToduleDBContract.TodoNotification.CONTENT_ID_URI_BASE, notifId);
-        Cursor cr = context.getContentResolver().query(notifUri, null, null, null, null);
-        cr.moveToNext();
-        long toduleId = cr.getLong(cr.getColumnIndexOrThrow(ToduleDBContract.TodoNotification.COLUMN_NAME_TODULE_ID));
-        cr.close();
-
-        cancelReminderByToduleId(context, toduleId);
-    }
 }

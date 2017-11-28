@@ -25,7 +25,7 @@
         </provider>
         <receiver android:name=".activities.NotificationReceiver">
             <intent-filter>
-                <action android:name="com.example.daniel.todule_android.VIEW_ENTRY"/>
+                <action android:name="com.example.daniel.todule_android.REMINDER_NOTIFICATION"/>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.REBOOT"/>
                 <data android:scheme="@string/reminder_intent_scheme"/>

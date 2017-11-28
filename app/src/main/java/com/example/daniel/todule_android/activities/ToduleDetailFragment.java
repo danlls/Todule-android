@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.provider.ToduleDBContract;
 import com.example.daniel.todule_android.utilities.DateTimeUtils;
+import com.example.daniel.todule_android.utilities.NotificationHelper;
 
 
 /**
@@ -243,7 +244,6 @@ public class ToduleDetailFragment extends Fragment {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Uri entryUri = ContentUris.withAppendedId(ToduleDBContract.TodoEntry.CONTENT_ID_URI_BASE, entryId);
-//                                myActivity.cancelReminder(entryUri);
                                 getContext().getContentResolver().delete(entryUri, null, null);
                                 Toast.makeText(getContext(), getString(R.string.entry_deleted) + ": " + title, Toast.LENGTH_SHORT).show();
                                 myActivity.onBackPressed();

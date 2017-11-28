@@ -34,6 +34,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         if (intent != null) {
             String action = intent.getAction();
             if (action != null) {
+
                 if (action.equals("android.intent.action.BOOT_COMPLETED") || action.equals("android.intent.action.REBOOT")) {
                     Log.d("BroadCast Received", "ON BOOT COMPLETE");
                     Cursor cr = context.getContentResolver().query(ToduleDBContract.TodoNotification.CONTENT_URI, null, null, null, null);
@@ -47,8 +48,10 @@ public class NotificationReceiver extends BroadcastReceiver {
                     } finally {
                         cr.close();
                     }
-                } else if (action.equals("com.example.daniel.todule_android.VIEW_ENTRY")) {
+                } else if (action.equals("com.example.daniel.todule_android.REMINDER_NOTIFICATION")) {
                     long entryId = intent.getLongExtra("todule_id", -1L);
+
+                    // Intent to redirect user to app when notification is clicked
                     Intent notificationIntent = new Intent(context, MainActivity.class);
                     notificationIntent.putExtra("todule_id", entryId);
                     notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -61,12 +64,27 @@ public class NotificationReceiver extends BroadcastReceiver {
                                     PendingIntent.FLAG_UPDATE_CURRENT
                             );
 
+                    // Intent to delete reminder after notification is canceled
+                    Intent notificationDeleteIntent = new Intent(context, getClass());
+                    notificationDeleteIntent.setAction("com.example.daniel.todule_android.DELETE_REMINDER");
+                    notificationDeleteIntent.putExtra("todule_id", entryId);
+
+                    PendingIntent notifDeletePendingIntent =
+                            PendingIntent.getBroadcast(
+                                    context,
+                                    0,
+                                    notificationDeleteIntent,
+                                    PendingIntent.FLAG_CANCEL_CURRENT
+                            );
+
+                    // Construct notification
                     NotificationCompat.Builder mBuilder =
                             new NotificationCompat.Builder(context, CHANNEL_ID)
                                     .setSmallIcon(R.drawable.ic_stat_todule)
                                     .setContentTitle("Reminder: " + intent.getStringExtra("todule_title"))
                                     .setContentText(intent.getStringExtra("todule_due_date"))
                                     .setContentIntent(resultPendingIntent)
+                                    .setDeleteIntent(notifDeletePendingIntent)
                                     .setAutoCancel(true);
 
                     mBuilder.setDefaults(Notification.DEFAULT_ALL);
@@ -77,6 +95,10 @@ public class NotificationReceiver extends BroadcastReceiver {
 
                     // Builds the notification and issues it.
                     mNotifyMgr.notify((int) entryId, mBuilder.build());
+
+                } else if(action.equals("com.example.daniel.todule_android.DELETE_REMINDER")) {
+                    long toduleId = intent.getLongExtra("todule_id", -1L);
+                    NotificationHelper.cancelReminderByToduleId(context, toduleId);
                 }
             }
 
