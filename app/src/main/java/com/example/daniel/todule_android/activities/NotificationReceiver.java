@@ -37,7 +37,9 @@ public class NotificationReceiver extends BroadcastReceiver {
 
                 if (action.equals("android.intent.action.BOOT_COMPLETED") || action.equals("android.intent.action.REBOOT")) {
                     Log.d("BroadCast Received", "ON BOOT COMPLETE");
-                    Cursor cr = context.getContentResolver().query(ToduleDBContract.TodoNotification.CONTENT_URI, null, null, null, null);
+                    String select = ToduleDBContract.TodoNotification.COLUMN_NAME_REMINDER_CANCELED + " = ?";
+                    String[] selectionArgs = {String.valueOf(ToduleDBContract.TodoNotification.REMINDER_NOT_CANCELED)};
+                    Cursor cr = context.getContentResolver().query(ToduleDBContract.TodoNotification.CONTENT_URI, null, select, selectionArgs, null);
                     try {
                         while (cr.moveToNext()) {
                             long toduleId = cr.getLong(cr.getColumnIndexOrThrow(ToduleDBContract.TodoNotification.COLUMN_NAME_TODULE_ID));
@@ -98,7 +100,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
                 } else if(action.equals("com.example.daniel.todule_android.DELETE_REMINDER")) {
                     long toduleId = intent.getLongExtra("todule_id", -1L);
-                    NotificationHelper.cancelReminderByToduleId(context, toduleId);
+                    NotificationHelper.cancelReminder(context, toduleId);
                 }
             }
 

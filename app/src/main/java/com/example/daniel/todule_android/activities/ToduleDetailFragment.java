@@ -1,7 +1,9 @@
 package com.example.daniel.todule_android.activities;
 
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.PorterDuff;
@@ -41,6 +43,7 @@ public class ToduleDetailFragment extends Fragment {
     int taskArchived;
     int taskDeleted;
     String title;
+    Context context;
 
     public static ToduleDetailFragment newInstance(long id) {
         ToduleDetailFragment f= new ToduleDetailFragment();
@@ -57,6 +60,7 @@ public class ToduleDetailFragment extends Fragment {
         myActivity = (MainActivity) getActivity();
         entryId = getArguments().getLong("entry_id");
         setHasOptionsMenu(true);
+        context = getContext();
     }
 
     @Nullable
@@ -204,6 +208,7 @@ public class ToduleDetailFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         final Uri entryUri = ContentUris.withAppendedId(ToduleDBContract.TodoEntry.CONTENT_ID_URI_BASE, entryId);
+        final ContentResolver resolver = context.getContentResolver();
         ContentValues cv = new ContentValues();
         Snackbar mySnackbar = null;
         switch(item.getItemId()){
@@ -222,15 +227,17 @@ public class ToduleDetailFragment extends Fragment {
             case R.id.action_soft_delete:
                 cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_DELETED, ToduleDBContract.TodoEntry.TASK_DELETED);
                 cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_DELETION_DATE, System.currentTimeMillis());
-                getContext().getContentResolver().update(entryUri, cv, null, null);
+                resolver.update(entryUri, cv, null, null);
+                NotificationHelper.cancelReminder(getContext(), entryUri);
                 mySnackbar = Snackbar.make(getView(), getString(R.string.entry_deleted) + ": " + title, Snackbar.LENGTH_LONG);
                 mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         ContentValues cv = new ContentValues();
-                        cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_DELETED, ToduleDBContract.TodoEntry.TASK_DELETED);
-                        cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_DELETION_DATE, System.currentTimeMillis());
-                        getContext().getContentResolver().update(entryUri, cv, null, null);
+                        cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_DELETED, ToduleDBContract.TodoEntry.TASK_NOT_DELETED);
+                        cv.putNull(ToduleDBContract.TodoEntry.COLUMN_NAME_DELETION_DATE);
+                        resolver.update(entryUri, cv, null, null);
+                        NotificationHelper.setReminder(context, entryUri, NotificationHelper.getReminderTime(context, entryUri));
                     }
                 });
                 mySnackbar.show();
@@ -258,7 +265,8 @@ public class ToduleDetailFragment extends Fragment {
             case R.id.action_restore:
                 cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_DELETED, ToduleDBContract.TodoEntry.TASK_NOT_DELETED);
                 cv.putNull(ToduleDBContract.TodoEntry.COLUMN_NAME_DELETION_DATE);
-                getContext().getContentResolver().update(entryUri, cv, null, null);
+                resolver.update(entryUri, cv, null, null);
+                NotificationHelper.setReminder(context, entryUri, NotificationHelper.getReminderTime(context, entryUri));
                 mySnackbar = Snackbar.make(getView(), getString(R.string.entry_restored) + ": " + title, Snackbar.LENGTH_LONG);
                 mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
                     @Override
@@ -266,7 +274,8 @@ public class ToduleDetailFragment extends Fragment {
                         ContentValues cv = new ContentValues();
                         cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_DELETED, ToduleDBContract.TodoEntry.COLUMN_NAME_DELETED);
                         cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_DELETION_DATE, System.currentTimeMillis());
-                        getContext().getContentResolver().update(entryUri, cv, null, null);
+                        resolver.update(entryUri, cv, null, null);
+                        NotificationHelper.cancelReminder(context, entryUri);
                     }
                 });
                 mySnackbar.show();
@@ -274,14 +283,14 @@ public class ToduleDetailFragment extends Fragment {
                 return true;
             case R.id.action_archive:
                 cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_ARCHIVED, ToduleDBContract.TodoEntry.TASK_ARCHIVED);
-                getContext().getContentResolver().update(entryUri, cv, null, null);
+                resolver.update(entryUri, cv, null, null);
                 mySnackbar = Snackbar.make(getView(), getString(R.string.entry_archived) + ": " + title, Snackbar.LENGTH_LONG);
                 mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         ContentValues cv = new ContentValues();
                         cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_ARCHIVED, ToduleDBContract.TodoEntry.TASK_NOT_ARCHIVED);
-                        getContext().getContentResolver().update(entryUri, cv, null, null);
+                        resolver.update(entryUri, cv, null, null);
                     }
                 });
                 mySnackbar.show();
@@ -289,14 +298,14 @@ public class ToduleDetailFragment extends Fragment {
                 return true;
             case R.id.action_unarchive:
                 cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_ARCHIVED, ToduleDBContract.TodoEntry.TASK_NOT_ARCHIVED);
-                getContext().getContentResolver().update(entryUri, cv, null, null);
+                resolver.update(entryUri, cv, null, null);
                 mySnackbar = Snackbar.make(getView(), getString(R.string.entry_unarchived) + ": " + title, Snackbar.LENGTH_LONG);
                 mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         ContentValues cv = new ContentValues();
                         cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_ARCHIVED, ToduleDBContract.TodoEntry.TASK_ARCHIVED);
-                        getContext().getContentResolver().update(entryUri, cv, null, null);
+                        resolver.update(entryUri, cv, null, null);
                     }
                 });
                 mySnackbar.show();

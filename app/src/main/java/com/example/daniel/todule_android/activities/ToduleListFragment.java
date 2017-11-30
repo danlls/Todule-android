@@ -1,6 +1,7 @@
 package com.example.daniel.todule_android.activities;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -35,6 +36,7 @@ import com.example.daniel.todule_android.adapter.HistoryAdapter;
 import com.example.daniel.todule_android.adapter.MainCursorAdapter;
 import com.example.daniel.todule_android.parcelable.LongSparseArrayBooleanParcelable;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
+import com.example.daniel.todule_android.utilities.NotificationHelper;
 
 import java.util.ArrayList;
 
@@ -357,7 +359,7 @@ public class ToduleListFragment extends ListFragment implements
     private void softDeleteSelectedItems(){
         final ContentResolver resolver = getContext().getContentResolver();
         int size = selectedIds.size();
-        Long[] mArray = new Long[size];
+        final Long[] mArray = new Long[size];
         for (int i = 0; i < size; i++) {
             long id = selectedIds.keyAt(i);
             mArray[i] = id;
@@ -369,9 +371,11 @@ public class ToduleListFragment extends ListFragment implements
         final String[] selectionArgs = new String[mArray.length];
         for (int i =0; i< mArray.length; i++){
             selectionArgs[i] = String.valueOf(mArray[i]);
+            Uri entryUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, mArray[i]);
+            NotificationHelper.cancelReminder(getContext(), entryUri);
         }
         int count = resolver.update(TodoEntry.CONTENT_URI, cv, select, selectionArgs);
-        Snackbar mySnackbar = Snackbar.make(getView(), String.valueOf(count) + " " + getString(R.string.entry_deleted), Snackbar.LENGTH_LONG);
+        final Snackbar mySnackbar = Snackbar.make(getView(), String.valueOf(count) + " " + getString(R.string.entry_deleted), Snackbar.LENGTH_LONG);
         mySnackbar.setAction(R.string.undo_string, new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -379,6 +383,10 @@ public class ToduleListFragment extends ListFragment implements
                 cv.put(TodoEntry.COLUMN_NAME_DELETED, TodoEntry.TASK_NOT_DELETED);
                 cv.putNull(TodoEntry.COLUMN_NAME_DELETION_DATE);
                 resolver.update(TodoEntry.CONTENT_URI, cv, select, selectionArgs);
+                for (int i =0; i< mArray.length; i++){
+                    Uri entryUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, mArray[i]);
+                    NotificationHelper.setReminder(getContext(), entryUri, NotificationHelper.getReminderTime(getContext(), entryUri));
+                }
             }
         });
         mySnackbar.show();
@@ -387,7 +395,7 @@ public class ToduleListFragment extends ListFragment implements
     private void restoreSelectedItems(){
         final ContentResolver resolver = getContext().getContentResolver();
         int size = selectedIds.size();
-        Long[] mArray = new Long[size];
+        final Long[] mArray = new Long[size];
         for (int i = 0; i < size; i++) {
             long id = selectedIds.keyAt(i);
             mArray[i] = id;
@@ -399,6 +407,8 @@ public class ToduleListFragment extends ListFragment implements
         final String[] selectionArgs = new String[mArray.length];
         for (int i =0; i< mArray.length; i++){
             selectionArgs[i] = String.valueOf(mArray[i]);
+            Uri entryUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, mArray[i]);
+            NotificationHelper.setReminder(getContext(), entryUri, NotificationHelper.getReminderTime(getContext(), entryUri));
         }
         int count = resolver.update(TodoEntry.CONTENT_URI, cv, select ,selectionArgs);
         Snackbar mySnackbar = Snackbar.make(getView(), String.valueOf(count)+ " " + getString(R.string.entry_restored), Snackbar.LENGTH_LONG);
@@ -409,6 +419,10 @@ public class ToduleListFragment extends ListFragment implements
                 cv.put(TodoEntry.COLUMN_NAME_DELETED, TodoEntry.TASK_DELETED);
                 cv.put(TodoEntry.COLUMN_NAME_DELETION_DATE, System.currentTimeMillis());
                 resolver.update(TodoEntry.CONTENT_URI, cv, select, selectionArgs);
+                for (int i =0; i< mArray.length; i++){
+                    Uri entryUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, mArray[i]);
+                    NotificationHelper.cancelReminder(getContext(), entryUri);
+                }
             }
         });
         mySnackbar.show();

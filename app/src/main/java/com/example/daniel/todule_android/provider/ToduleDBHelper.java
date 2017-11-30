@@ -47,6 +47,7 @@ public class ToduleDBHelper extends SQLiteOpenHelper{
                     TodoNotification._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     TodoNotification.COLUMN_NAME_TODULE_ID + " INTEGER," +
                     TodoNotification.COLUMN_NAME_REMINDER_TIME + " INTEGER" +
+                    TodoNotification.COLUMN_NAME_REMINDER_CANCELED + " INTEGER" +
                     ");";
 
     private static final String SQL_DELETE_NOTIFICATIONS =
@@ -54,7 +55,7 @@ public class ToduleDBHelper extends SQLiteOpenHelper{
 
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 13;
+    public static final int DATABASE_VERSION = 14;
     public static final String DATABASE_NAME = "Todule.db";
 
     public ToduleDBHelper(Context context) {
@@ -87,6 +88,9 @@ public class ToduleDBHelper extends SQLiteOpenHelper{
         }
         if (oldVersion < 13){
             db.execSQL(SQL_CREATE_NOTIFICATIONS);
+        }
+        if (oldVersion < 14){
+            db.execSQL("ALTER TABLE " + TodoNotification.TABLE_NAME + " ADD COLUMN " + TodoNotification.COLUMN_NAME_REMINDER_CANCELED + " INTEGER");
         }
         else {
             db.execSQL(SQL_DELETE_ENTRIES);
