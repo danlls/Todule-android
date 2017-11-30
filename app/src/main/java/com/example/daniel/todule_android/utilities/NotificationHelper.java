@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 
 import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.activities.NotificationReceiver;
@@ -44,20 +45,64 @@ public class NotificationHelper {
         PendingIntent pIntent = initReminderPendingIntent(context, toduleUri);
         AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         am.set(AlarmManager.RTC_WAKEUP, datetimeInMillis, pIntent);
+
+        // Only update columns if notification instance was created previously
+        long toduleId = ContentUris.parseId(toduleUri);
+        String select = ToduleDBContract.TodoNotification.COLUMN_NAME_TODULE_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(toduleId)};
         ContentValues cv = new ContentValues();
-        cv.put(ToduleDBContract.TodoNotification.COLUMN_NAME_TODULE_ID, ContentUris.parseId(toduleUri));
         cv.put(ToduleDBContract.TodoNotification.COLUMN_NAME_REMINDER_TIME, datetimeInMillis);
-        context.getContentResolver().insert(ToduleDBContract.TodoNotification.CONTENT_URI, cv);
+        cv.put(ToduleDBContract.TodoNotification.COLUMN_NAME_REMINDER_CANCELED, ToduleDBContract.TodoNotification.REMINDER_NOT_CANCELED);
+        int nRowsEffected = context.getContentResolver().update(ToduleDBContract.TodoNotification.CONTENT_URI, cv, select, selectionArgs);
+
+        // Insert db as no instance was created before
+        if(nRowsEffected == 0){
+            cv = new ContentValues();
+            cv.put(ToduleDBContract.TodoNotification.COLUMN_NAME_TODULE_ID, ContentUris.parseId(toduleUri));
+            cv.put(ToduleDBContract.TodoNotification.COLUMN_NAME_REMINDER_TIME, datetimeInMillis);
+            cv.put(ToduleDBContract.TodoNotification.COLUMN_NAME_REMINDER_CANCELED, ToduleDBContract.TodoNotification.REMINDER_NOT_CANCELED);
+            context.getContentResolver().insert(ToduleDBContract.TodoNotification.CONTENT_URI, cv);
+        }
     }
 
-    public static void cancelReminderByToduleId(Context context, long toduleId){
+    public static void cancelReminder(Context context, Uri toduleUri){
+        PendingIntent pIntent = initReminderPendingIntent(context, toduleUri);
+        AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+        am.cancel(pIntent);
+
+        long toduleId = ContentUris.parseId(toduleUri);
+        String select = ToduleDBContract.TodoNotification.COLUMN_NAME_TODULE_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(toduleId)};
+
+        ContentValues cv = new ContentValues();
+        cv.put(ToduleDBContract.TodoNotification.COLUMN_NAME_REMINDER_CANCELED, ToduleDBContract.TodoNotification.REMINDER_CANCELED);
+        context.getContentResolver().update(ToduleDBContract.TodoNotification.CONTENT_URI, cv, select, selectionArgs);
+    }
+
+    public static void cancelReminder(Context context, long toduleId){
         Uri toduleUri = ContentUris.withAppendedId(ToduleDBContract.TodoEntry.CONTENT_ID_URI_BASE, toduleId);
         PendingIntent pIntent = initReminderPendingIntent(context, toduleUri);
         AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         am.cancel(pIntent);
+
         String select = ToduleDBContract.TodoNotification.COLUMN_NAME_TODULE_ID + " = ?";
         String[] selectionArgs = {String.valueOf(toduleId)};
-        context.getContentResolver().delete(ToduleDBContract.TodoNotification.CONTENT_URI, select, selectionArgs);
+
+        ContentValues cv = new ContentValues();
+        cv.put(ToduleDBContract.TodoNotification.COLUMN_NAME_REMINDER_CANCELED, ToduleDBContract.TodoNotification.REMINDER_CANCELED);
+        context.getContentResolver().update(ToduleDBContract.TodoNotification.CONTENT_URI, cv, select, selectionArgs);
+    }
+
+    public static long getReminderTime(Context context, Uri toduleUri){
+        long toduleId = ContentUris.parseId(toduleUri);
+        String select = ToduleDBContract.TodoNotification.COLUMN_NAME_TODULE_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(toduleId)};
+
+        Cursor cr = context.getContentResolver().query(ToduleDBContract.TodoNotification.CONTENT_URI, null, select, selectionArgs, null);
+        cr.moveToNext();
+        long reminderTime = cr.getLong(cr.getColumnIndexOrThrow(ToduleDBContract.TodoNotification.COLUMN_NAME_REMINDER_TIME));
+        cr.close();
+        return reminderTime;
     }
 
 }

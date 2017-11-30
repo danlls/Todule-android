@@ -80,7 +80,7 @@ public class ToduleProvider extends ContentProvider{
             case NOTIFICATION_LIST:
                 builder.setTables(TodoNotification.TABLE_NAME);
                 if (TextUtils.isEmpty(sortOrder)) {
-                    sortOrder = TodoEntry.SORT_ORDER_DEFAULT;
+                    sortOrder = TodoNotification.SORT_ORDER_DEFAULT;
                 }
                 break;
             case NOTIFICATION_ID:
