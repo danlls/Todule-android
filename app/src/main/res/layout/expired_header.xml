@@ -13,7 +13,7 @@
         android:textSize="16sp"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:layout_centerVertical="true"
-        android:text="You have expired todule"
+        android:text="@string/expired_header"
         android:layout_marginEnd="10dp"/>
 
     <TextView

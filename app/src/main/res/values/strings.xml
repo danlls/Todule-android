@@ -43,4 +43,5 @@
     <string name="delete_forever">Delete forever</string>
     <string name="empty_bin">Empty bin</string>
     <string name="bin_emptied">Bin emptied</string>
+    <string name="expired_header">You have expired todule</string>
 </resources>
