@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="12dp"
+    android:background="@color/normalGrey">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/expired_header_text"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_centerVertical="true"
+        android:text="You have expired todule"
+        android:layout_marginEnd="10dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/expired_count"
+        android:textColor="@color/white"
+        android:background="@drawable/item_count"
+        android:layout_toEndOf="@+id/expired_header_text"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/header_arrow"
+        android:src="@drawable/ic_keyboard_arrow_right_black_24dp"
+        android:layout_alignParentRight="true"
+        android:contentDescription="Go"
+        android:layout_centerVertical="true"
+        />
+
+</RelativeLayout>

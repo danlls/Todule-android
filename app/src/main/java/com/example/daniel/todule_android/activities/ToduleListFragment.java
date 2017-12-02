@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.daniel.todule_android.R;
@@ -59,6 +60,8 @@ public class ToduleListFragment extends ListFragment implements
     private int loaderId;
     private LongSparseArray<Boolean> selectedIds;
 
+    ActionMode mActionMode;
+    View expiredHeader;
     SearchView searchView;
     String mCurFilter;
 
@@ -130,6 +133,43 @@ public class ToduleListFragment extends ListFragment implements
                 return true;
             }
         });
+
+
+
+        if(loaderId == INCOMPLETE_LOADER_ID){
+            // Check if there is any expired todule
+            String select = "(" + TodoEntry.COLUMN_NAME_TITLE + " NOTNULL) AND ("
+                    + TodoEntry.COLUMN_NAME_DUE_DATE + " < ?) AND ("
+                    + TodoEntry.COLUMN_NAME_TASK_DONE + " == ?) AND ("
+                    + TodoEntry.COLUMN_NAME_DELETED + " == ?)";
+            String[] selectionArgs = {
+                    String.valueOf(System.currentTimeMillis()),
+                    String.valueOf(TodoEntry.TASK_NOT_COMPLETED),
+                    String.valueOf(TodoEntry.TASK_NOT_DELETED)
+            };
+            Cursor cr = getContext().getContentResolver().query(TodoEntry.CONTENT_URI, null, select, selectionArgs, null);
+            if(cr.getCount() > 0){
+                expiredHeader = View.inflate(getContext(), R.layout.expired_header, null);
+                TextView expiredCount = expiredHeader.findViewById(R.id.expired_count);
+                expiredCount.setText(String.valueOf(cr.getCount()));
+                expiredHeader.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(mActionMode !=  null){
+                            mActionMode.finish();
+                        }
+                        ToduleListFragment f = newInstance(EXPIRED_LOADER_ID);
+                        myActivity.getSupportFragmentManager().beginTransaction()
+                                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                                .replace(R.id.fragment_container, f)
+                                .addToBackStack(null)
+                                .commit();
+                    }
+                });
+                listView.addHeaderView(expiredHeader, null, true);
+            }
+            cr.close();
+        }
     }
 
     @Override
@@ -288,6 +328,7 @@ public class ToduleListFragment extends ListFragment implements
             }
 
             actionMode.setTitle(selectedIds.size() + " selected");
+            mActionMode = actionMode;
             return true;
         }
 
@@ -339,6 +380,7 @@ public class ToduleListFragment extends ListFragment implements
             } else if (mAdapter instanceof MainCursorAdapter){
                 ((MainCursorAdapter) mAdapter).setShowCheckbox(false);
             }
+            actionMode = null;
         }
     };
 
