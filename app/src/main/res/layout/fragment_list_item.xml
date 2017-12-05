@@ -81,8 +81,7 @@
             android:elevation="2dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            style="?android:attr/buttonBarButtonStyle"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
     </RelativeLayout>
 

@@ -266,7 +266,15 @@ public class ToduleDetailFragment extends Fragment {
                 cv.put(ToduleDBContract.TodoEntry.COLUMN_NAME_DELETED, ToduleDBContract.TodoEntry.TASK_NOT_DELETED);
                 cv.putNull(ToduleDBContract.TodoEntry.COLUMN_NAME_DELETION_DATE);
                 resolver.update(entryUri, cv, null, null);
-                NotificationHelper.setReminder(context, entryUri, NotificationHelper.getReminderTime(context, entryUri));
+                // Set reminder if todule is not completed or expired
+                Cursor cr = getContext().getContentResolver().query(entryUri, null, null, null ,null);
+                cr.moveToNext();
+                int completed = cr.getInt(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_TASK_DONE));
+                long due_date = cr.getLong(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_DUE_DATE));
+                cr.close();
+                if(!(completed == ToduleDBContract.TodoEntry.TASK_COMPLETED || due_date < System.currentTimeMillis())){
+                    NotificationHelper.setReminder(context, entryUri, NotificationHelper.getReminderTime(context, entryUri));
+                }
                 mySnackbar = Snackbar.make(getView(), getString(R.string.entry_restored) + ": " + title, Snackbar.LENGTH_LONG);
                 mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
                     @Override

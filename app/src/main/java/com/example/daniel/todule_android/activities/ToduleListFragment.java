@@ -199,6 +199,7 @@ public class ToduleListFragment extends ListFragment implements
         Uri ENTRY_URI = TodoEntry.CONTENT_URI;
         String select = "";
         ArrayList<String> selectionArgs = new ArrayList<String>();
+        String sortOrder = "";
 
         switch(loaderId){
             case INCOMPLETE_LOADER_ID:
@@ -227,6 +228,7 @@ public class ToduleListFragment extends ListFragment implements
                 selectionArgs.add(String.valueOf(TodoEntry.TASK_COMPLETED));
                 selectionArgs.add(String.valueOf(TodoEntry.TASK_NOT_ARCHIVED));
                 selectionArgs.add(String.valueOf(TodoEntry.TASK_NOT_DELETED));
+                sortOrder = TodoEntry.COLUMN_NAME_COMPLETED_DATE + " DESC";
                 break;
             case ARCHIVE_LOADER_ID:
                 select = "(" + TodoEntry.COLUMN_NAME_TITLE + " NOTNULL) AND ("
@@ -234,11 +236,13 @@ public class ToduleListFragment extends ListFragment implements
                         + TodoEntry.COLUMN_NAME_DELETED + " == ?)";
                 selectionArgs.add(String.valueOf(TodoEntry.TASK_ARCHIVED));
                 selectionArgs.add(String.valueOf(TodoEntry.TASK_NOT_DELETED));
+                sortOrder = TodoEntry.COLUMN_NAME_COMPLETED_DATE + " DESC";
                 break;
             case DELETED_LOADER_ID:
                 select = "(" + TodoEntry.COLUMN_NAME_TITLE + " NOTNULL) AND ("
                     + TodoEntry.COLUMN_NAME_DELETED + " == ?)";
                 selectionArgs.add(String.valueOf(TodoEntry.TASK_DELETED));
+                sortOrder = TodoEntry.COLUMN_NAME_DELETION_DATE + " DESC";
                 break;
             default:
                 break;
@@ -250,7 +254,7 @@ public class ToduleListFragment extends ListFragment implements
         String [] selectionArgsArray = new String[selectionArgs.size()];
         selectionArgs.toArray(selectionArgsArray);
         cursorLoader = new CursorLoader(getActivity(), ENTRY_URI,
-                TodoEntry.PROJECTION_ALL, select, selectionArgsArray, TodoEntry.SORT_ORDER_DEFAULT);
+                TodoEntry.PROJECTION_ALL, select, selectionArgsArray, sortOrder);
         return cursorLoader;
     }
 
@@ -450,7 +454,15 @@ public class ToduleListFragment extends ListFragment implements
         for (int i =0; i< mArray.length; i++){
             selectionArgs[i] = String.valueOf(mArray[i]);
             Uri entryUri = ContentUris.withAppendedId(TodoEntry.CONTENT_ID_URI_BASE, mArray[i]);
-            NotificationHelper.setReminder(getContext(), entryUri, NotificationHelper.getReminderTime(getContext(), entryUri));
+            // Set reminder if todule is not completed or expired
+            Cursor cr = getContext().getContentResolver().query(entryUri, null, null, null ,null);
+            cr.moveToNext();
+            int completed = cr.getInt(cr.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_TASK_DONE));
+            long due_date = cr.getLong(cr.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_DUE_DATE));
+            cr.close();
+            if(!(completed == TodoEntry.TASK_COMPLETED || due_date < System.currentTimeMillis())){
+                NotificationHelper.setReminder(getContext(), entryUri, NotificationHelper.getReminderTime(getContext(), entryUri));
+            }
         }
         int count = resolver.update(TodoEntry.CONTENT_URI, cv, select ,selectionArgs);
         Snackbar mySnackbar = Snackbar.make(getView(), String.valueOf(count)+ " " + getString(R.string.entry_restored), Snackbar.LENGTH_LONG);
