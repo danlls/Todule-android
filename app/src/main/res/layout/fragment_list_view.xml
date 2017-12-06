@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:gravity="center"
-                android:text="Nothing in here :("/>
+                android:text="@string/empty_view_text"/>
 
         </ScrollView>
 

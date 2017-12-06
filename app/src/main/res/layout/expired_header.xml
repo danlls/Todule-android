@@ -29,8 +29,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/header_arrow"
         android:src="@drawable/ic_keyboard_arrow_right_black_24dp"
-        android:layout_alignParentRight="true"
-        android:contentDescription="Go"
+        android:layout_alignParentEnd="true"
+        android:contentDescription="@string/go_arrow"
         android:layout_centerVertical="true"
         />
 

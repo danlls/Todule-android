@@ -51,7 +51,6 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:drawableStart="@drawable/ic_done_white_18dp"
-            android:drawableTint="@color/normalGreen"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
     </RelativeLayout>
 
