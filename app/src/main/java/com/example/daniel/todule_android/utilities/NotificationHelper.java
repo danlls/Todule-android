@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
 
 import com.example.daniel.todule_android.R;
 import com.example.daniel.todule_android.activities.NotificationReceiver;

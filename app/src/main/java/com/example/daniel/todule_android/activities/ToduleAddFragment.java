@@ -15,7 +15,6 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,7 +29,6 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.daniel.todule_android.R;
-import com.example.daniel.todule_android.adapter.LabelAdapter;
 import com.example.daniel.todule_android.provider.ToduleDBContract;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
 import com.example.daniel.todule_android.utilities.NotificationHelper;

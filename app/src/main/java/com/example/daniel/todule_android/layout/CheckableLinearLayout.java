@@ -1,10 +1,8 @@
 package com.example.daniel.todule_android.layout;
 
 import android.content.Context;
-import android.graphics.drawable.ColorDrawable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.CheckBox;
 import android.widget.Checkable;
 import android.widget.LinearLayout;

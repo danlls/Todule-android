@@ -1,12 +1,7 @@
 package com.example.daniel.todule_android.activities;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -29,8 +24,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import com.example.daniel.todule_android.R;
-import com.example.daniel.todule_android.provider.ToduleDBContract;
-import com.example.daniel.todule_android.utilities.DateTimeUtils;
 
 
 public class MainActivity extends AppCompatActivity implements

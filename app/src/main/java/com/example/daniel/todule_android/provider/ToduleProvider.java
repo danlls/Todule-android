@@ -13,8 +13,6 @@ import com.example.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoLabel;
 import com.example.daniel.todule_android.provider.ToduleDBContract.TodoNotification;
 
-import org.w3c.dom.Text;
-
 /**
  * Created by danieL on 7/31/2017.
  */
