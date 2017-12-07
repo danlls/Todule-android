@@ -5,12 +5,14 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.util.LongSparseArray;
@@ -28,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -606,6 +609,11 @@ public class ToduleListFragment extends ListFragment implements
 
         searchView = new SearchView(myActivity);
         searchView.setMaxWidth(Integer.MAX_VALUE);
+
+        // Set searchbox text to white
+        EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchEditText.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+        searchEditText.setHintTextColor(ContextCompat.getColor(getContext(), R.color.white));
 
         searchView.setOnQueryTextListener(this);
         item.setActionView(searchView);
