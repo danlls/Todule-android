@@ -15,6 +15,7 @@ import android.util.Log;
 
 import com.danlls.daniel.todule_android.R;
 import com.danlls.daniel.todule_android.provider.ToduleDBContract;
+import com.danlls.daniel.todule_android.utilities.DateTimeUtils;
 import com.danlls.daniel.todule_android.utilities.NotificationHelper;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
@@ -96,7 +97,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                             new NotificationCompat.Builder(context, CHANNEL_ID)
                                     .setSmallIcon(R.drawable.ic_stat_todule)
                                     .setContentTitle("Reminder: " + intent.getStringExtra("todule_title"))
-                                    .setContentText(intent.getStringExtra("todule_due_date"))
+                                    .setContentText(DateTimeUtils.dateTimeDiff(System.currentTimeMillis(),intent.getLongExtra("todule_due_date", -1L)))
                                     .setContentIntent(resultPendingIntent)
                                     .setDeleteIntent(notifDeletePendingIntent)
                                     .setAutoCancel(true);

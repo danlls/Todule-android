@@ -44,7 +44,7 @@ public class MainCursorAdapter extends CursorAdapter {
         String description = cursor.getString(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_DESCRIPTION));
         long dueDate = cursor.getLong(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_DUE_DATE));
         String dueDateString = DateUtils.formatDateTime(context, dueDate, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_TIME);
-        String countdownString =  DateTimeUtils.dateTimeDiff(dueDate);
+        String countdownString =  DateTimeUtils.dateTimeDiff(System.currentTimeMillis(), dueDate);
         if (!cursor.isNull(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_LABEL))){
             Long labelId = cursor.getLong(cursor.getColumnIndexOrThrow(TodoEntry.COLUMN_NAME_LABEL));
             Uri labelUri = ContentUris.withAppendedId(ToduleDBContract.TodoLabel.CONTENT_ID_URI_BASE, labelId);

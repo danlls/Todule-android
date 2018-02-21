@@ -27,14 +27,14 @@ public class NotificationHelper {
         long itemId = Long.valueOf(toduleUri.getLastPathSegment());
         String title = cr.getString(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_TITLE));
         long dueDate = cr.getLong(cr.getColumnIndexOrThrow(ToduleDBContract.TodoEntry.COLUMN_NAME_DUE_DATE));
-        String dueDateString = DateTimeUtils.dateTimeDiff(dueDate);
+//        String dueDateString = DateTimeUtils.dateTimeDiff(dueDate - 60 * 60 * 1000 , dueDate);
 
         Intent intent = new Intent(context, NotificationReceiver.class);
         intent.setData(Uri.parse(R.string.reminder_intent_scheme + String.valueOf(itemId)));
         intent.setAction("com.danlls.daniel.todule_android.REMINDER_NOTIFICATION");
         intent.putExtra("todule_id", itemId);
         intent.putExtra("todule_title", title);
-        intent.putExtra("todule_due_date", dueDateString);
+        intent.putExtra("todule_due_date", dueDate);
         PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         cr.close();
         return sender;
