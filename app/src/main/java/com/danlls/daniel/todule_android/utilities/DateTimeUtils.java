@@ -13,10 +13,10 @@ public final class DateTimeUtils {
         return then - now;
     }
 
-    public static String dateTimeDiff (long then) {
+    public static String dateTimeDiff (long from, long to) {
         String result;
         String pastOrFuture;
-        long diff = millisDiffFromNow(then);
+        long diff = to - from;
         if (diff < 0 ) {
             pastOrFuture = " ago";
         } else {

@@ -104,8 +104,8 @@ public class ToduleDetailFragment extends Fragment {
 
         String createDateString = DateUtils.formatDateTime(getContext(), createdDate, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_TIME);
         String dueDateString = DateUtils.formatDateTime(getContext(), dueDate, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_TIME);
-        String countdownString =  DateTimeUtils.dateTimeDiff(dueDate);
-        String completeDateString = DateTimeUtils.dateTimeDiff(completeDate);
+        String countdownString =  DateTimeUtils.dateTimeDiff(System.currentTimeMillis() ,dueDate);
+        String completeDateString = DateTimeUtils.dateTimeDiff(System.currentTimeMillis(), completeDate);
 
         if(taskDone == ToduleDBContract.TodoEntry.TASK_NOT_COMPLETED){
             if(dueDate < System.currentTimeMillis()) {
