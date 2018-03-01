@@ -2,6 +2,7 @@ package com.danlls.daniel.todule_android.activities;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -14,7 +15,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.ActionMode;
 import android.view.MenuItem;
@@ -261,6 +261,7 @@ public class MainActivity extends AppCompatActivity implements
         // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorAccentDark));
+
     }
 
     @Override

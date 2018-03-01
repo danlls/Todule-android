@@ -38,6 +38,7 @@ import com.danlls.daniel.todule_android.R;
 import com.danlls.daniel.todule_android.adapter.HistoryAdapter;
 import com.danlls.daniel.todule_android.adapter.MainCursorAdapter;
 import com.danlls.daniel.todule_android.parcelable.LongSparseArrayBooleanParcelable;
+import com.danlls.daniel.todule_android.provider.ToduleDBContract;
 import com.danlls.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
 import com.danlls.daniel.todule_android.utilities.NotificationHelper;
 
@@ -144,6 +145,7 @@ public class ToduleListFragment extends ListFragment implements
                     + TodoEntry.COLUMN_NAME_DUE_DATE + " < ?) AND ("
                     + TodoEntry.COLUMN_NAME_TASK_DONE + " == ?) AND ("
                     + TodoEntry.COLUMN_NAME_DELETED + " == ?)";
+
             String[] selectionArgs = {
                     String.valueOf(System.currentTimeMillis()),
                     String.valueOf(TodoEntry.TASK_NOT_COMPLETED),
@@ -250,14 +252,40 @@ public class ToduleListFragment extends ListFragment implements
                 break;
         }
         if (mCurFilter != null){
-            select += " AND (" + TodoEntry.COLUMN_NAME_TITLE + " LIKE ?)";
-            selectionArgs.add("%" + mCurFilter + "%");
+
+              Uri LABEL_URI = ToduleDBContract.TodoLabel.CONTENT_URI;
+              String labelSelect = "(" + ToduleDBContract.TodoLabel.COLUMN_NAME_TAG + " LIKE ?)";
+              Cursor labelCr = getContext().getContentResolver().query(LABEL_URI, ToduleDBContract.TodoLabel.PROJECTION_ALL, labelSelect,new String[]{"%" + mCurFilter + "%"},null);
+              ArrayList<String> labelIdList = new ArrayList<>();
+              while (labelCr.moveToNext()){
+                  labelIdList.add(labelCr.getString(labelCr.getColumnIndexOrThrow(ToduleDBContract.TodoLabel._ID)));
+              }
+
+              String idValue = listToString(labelIdList);
+              select += " AND ((" + TodoEntry.COLUMN_NAME_TITLE + " LIKE ?)";
+              selectionArgs.add("%" + mCurFilter + "%");
+              if (idValue != null)
+              select += " OR (" + TodoEntry.COLUMN_NAME_LABEL+ " IN ("+idValue+")))";
+              else select+=")";
+
         }
         String [] selectionArgsArray = new String[selectionArgs.size()];
         selectionArgs.toArray(selectionArgsArray);
         cursorLoader = new CursorLoader(getActivity(), ENTRY_URI,
                 TodoEntry.PROJECTION_ALL, select, selectionArgsArray, sortOrder);
+
         return cursorLoader;
+    }
+
+    public String listToString (ArrayList<String> list){
+        if (!list.isEmpty()){
+        String tmp = "";
+        for (String str : list ){
+            tmp += "'"+str+"',";
+        }
+        tmp = tmp.substring(0,tmp.length() - 1);
+        return tmp;}
+        else{return null;}
     }
 
     @Override
