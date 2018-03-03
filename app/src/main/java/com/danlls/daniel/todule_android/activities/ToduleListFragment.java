@@ -145,7 +145,6 @@ public class ToduleListFragment extends ListFragment implements
                     + TodoEntry.COLUMN_NAME_DUE_DATE + " < ?) AND ("
                     + TodoEntry.COLUMN_NAME_TASK_DONE + " == ?) AND ("
                     + TodoEntry.COLUMN_NAME_DELETED + " == ?)";
-
             String[] selectionArgs = {
                     String.valueOf(System.currentTimeMillis()),
                     String.valueOf(TodoEntry.TASK_NOT_COMPLETED),

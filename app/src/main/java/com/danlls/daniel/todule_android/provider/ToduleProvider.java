@@ -27,7 +27,6 @@ public class ToduleProvider extends ContentProvider{
     private static final int NOTIFICATION_LIST = 5;
     private static final int NOTIFICATION_ID = 6;
 
-
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
@@ -69,7 +68,6 @@ public class ToduleProvider extends ContentProvider{
             case LABEL_LIST:
                 builder.setTables(TodoLabel.TABLE_NAME);
                 if (TextUtils.isEmpty(sortOrder)) {
-
                     sortOrder = TodoLabel.COLUMN_NAME_TAG;
                 }
                 break;
