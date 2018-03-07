@@ -38,6 +38,7 @@ import com.danlls.daniel.todule_android.R;
 import com.danlls.daniel.todule_android.adapter.HistoryAdapter;
 import com.danlls.daniel.todule_android.adapter.MainCursorAdapter;
 import com.danlls.daniel.todule_android.parcelable.LongSparseArrayBooleanParcelable;
+import com.danlls.daniel.todule_android.provider.ToduleDBContract;
 import com.danlls.daniel.todule_android.provider.ToduleDBContract.TodoEntry;
 import com.danlls.daniel.todule_android.utilities.NotificationHelper;
 
@@ -250,14 +251,48 @@ public class ToduleListFragment extends ListFragment implements
                 break;
         }
         if (mCurFilter != null){
-            select += " AND (" + TodoEntry.COLUMN_NAME_TITLE + " LIKE ?)";
-            selectionArgs.add("%" + mCurFilter + "%");
+
+              Uri LABEL_URI = ToduleDBContract.TodoLabel.CONTENT_URI;
+              String labelSelect = "(" + ToduleDBContract.TodoLabel.COLUMN_NAME_TAG + " LIKE ?)";
+              Cursor labelCr = getContext().getContentResolver().query(LABEL_URI, ToduleDBContract.TodoLabel.PROJECTION_ALL, labelSelect,new String[]{"%" + mCurFilter + "%"},null);
+              ArrayList<String> labelIdList = new ArrayList<>();
+              while (labelCr.moveToNext()){
+                  labelIdList.add(labelCr.getString(labelCr.getColumnIndexOrThrow(ToduleDBContract.TodoLabel._ID)));
+              }
+
+              //title
+              select += " AND ((" + TodoEntry.COLUMN_NAME_TITLE + " LIKE ?)";
+              selectionArgs.add("%" + mCurFilter + "%");
+              //label
+              if (!labelIdList.isEmpty()){
+              select += " OR (" + TodoEntry.COLUMN_NAME_LABEL+ " IN ("+makePlaceholders(labelIdList.size())+")))";
+              for (String labelId : labelIdList ){
+                      selectionArgs.add(labelId);
+                  }
+              }
+              else select+=")";
+
         }
         String [] selectionArgsArray = new String[selectionArgs.size()];
         selectionArgs.toArray(selectionArgsArray);
         cursorLoader = new CursorLoader(getActivity(), ENTRY_URI,
                 TodoEntry.PROJECTION_ALL, select, selectionArgsArray, sortOrder);
+
         return cursorLoader;
+    }
+
+    String makePlaceholders(int len) {
+        if (len < 1) {
+            // It will lead to an invalid query anyway ..
+            throw new RuntimeException("No placeholders");
+        } else {
+            StringBuilder sb = new StringBuilder(len * 2 - 1);
+            sb.append("?");
+            for (int i = 1; i < len; i++) {
+                sb.append(",?");
+            }
+            return sb.toString();
+        }
     }
 
     @Override
