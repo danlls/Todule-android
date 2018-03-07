@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -206,7 +207,7 @@ public class ToduleAddFragment extends Fragment{
 
             @Override
             public void afterTextChanged(Editable editable) {
-                long date_time = myCalendar.getTimeInMillis();
+                long date_time = myCalendar.getTimeInMillis();//utilise ca
                 long current_date_time = System.currentTimeMillis();
                 if (date_time < current_date_time) {
                     timeWrapper.setErrorEnabled(true);
@@ -222,6 +223,7 @@ public class ToduleAddFragment extends Fragment{
         DateFormat df = DateFormat.getDateInstance();
         dateEdit.setText(df.format(myCalendar.getTime()));
         DateFormat df2 = DateFormat.getTimeInstance(DateFormat.SHORT);
+
         timeEdit.setText(df2.format(myCalendar.getTime()));
 
         titleEdit.requestFocus();
@@ -288,6 +290,7 @@ public class ToduleAddFragment extends Fragment{
             case R.id.action_save:
                 if (validateInputs()){
                     updateEntry();
+                    ShowTos(MainActivity.Tdays);
                     getActivity().onBackPressed();
                 }
                 break;
@@ -295,6 +298,17 @@ public class ToduleAddFragment extends Fragment{
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    private void ShowTos(int d) {
+        String msg = "";
+        if (d == 0){
+            msg = "You will be notified "+MainActivity.Thours+" hours and "+MainActivity.Tmins+" mins before deadline";
+        }else{
+            msg = "You will be notified "+MainActivity.Tdays+" days and "+MainActivity.Thours+" hours and "+MainActivity.Tmins+" mins before deadline";
+        }
+        Toast.makeText(getActivity(),msg,
+                Toast.LENGTH_LONG).show();
     }
 
     private void updateEntry(){
@@ -328,7 +342,7 @@ public class ToduleAddFragment extends Fragment{
             Toast.makeText(myActivity, getString(R.string.entry_updated) + ": " + title_text, Toast.LENGTH_SHORT).show();
         }
         // Reminder set at one hour before due_date
-        NotificationHelper.setReminder(getContext(), entryUri, due_date - 60 * 60 * 1000);
+        NotificationHelper.setReminder(getContext(), entryUri, due_date - MainActivity.timing);
     }
 
     private boolean validateInputs() {

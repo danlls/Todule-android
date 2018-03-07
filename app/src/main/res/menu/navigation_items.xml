@@ -39,6 +39,11 @@
                     android:icon="@drawable/ic_label_black_24dp"
                     android:id="@+id/nav_label"
                     app:showAsAction="ifRoom|withText"/>
+                <item
+                    android:title="@string/nav_time"
+                    android:id="@+id/nav_time"
+                    android:icon="@drawable/ic_alarm_black_18dp"
+                    app:showAsAction="ifRoom|withText"/>
             </group>
         </menu>
     </item>

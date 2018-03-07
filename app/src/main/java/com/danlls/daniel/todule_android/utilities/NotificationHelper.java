@@ -8,8 +8,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 
 import com.danlls.daniel.todule_android.R;
+import com.danlls.daniel.todule_android.activities.MainActivity;
 import com.danlls.daniel.todule_android.activities.NotificationReceiver;
 import com.danlls.daniel.todule_android.provider.ToduleDBContract;
 
