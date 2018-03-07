@@ -260,11 +260,16 @@ public class ToduleListFragment extends ListFragment implements
                   labelIdList.add(labelCr.getString(labelCr.getColumnIndexOrThrow(ToduleDBContract.TodoLabel._ID)));
               }
 
-              String idValue = listToString(labelIdList);
+              //title
               select += " AND ((" + TodoEntry.COLUMN_NAME_TITLE + " LIKE ?)";
               selectionArgs.add("%" + mCurFilter + "%");
-              if (idValue != null)
-              select += " OR (" + TodoEntry.COLUMN_NAME_LABEL+ " IN ("+idValue+")))";
+              //label
+              if (!labelIdList.isEmpty()){
+              select += " OR (" + TodoEntry.COLUMN_NAME_LABEL+ " IN ("+makePlaceholders(labelIdList.size())+")))";
+              for (String labelId : labelIdList ){
+                      selectionArgs.add(labelId);
+                  }
+              }
               else select+=")";
 
         }
@@ -276,15 +281,18 @@ public class ToduleListFragment extends ListFragment implements
         return cursorLoader;
     }
 
-    public String listToString (ArrayList<String> list){
-        if (!list.isEmpty()){
-        String tmp = "";
-        for (String str : list ){
-            tmp += "'"+str+"',";
+    String makePlaceholders(int len) {
+        if (len < 1) {
+            // It will lead to an invalid query anyway ..
+            throw new RuntimeException("No placeholders");
+        } else {
+            StringBuilder sb = new StringBuilder(len * 2 - 1);
+            sb.append("?");
+            for (int i = 1; i < len; i++) {
+                sb.append(",?");
+            }
+            return sb.toString();
         }
-        tmp = tmp.substring(0,tmp.length() - 1);
-        return tmp;}
-        else{return null;}
     }
 
     @Override
