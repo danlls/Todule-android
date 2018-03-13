@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <provider
-            android:authorities="com.danlls.todule.provider"
+            android:authorities="${applicationId}.provider"
             android:name="com.danlls.daniel.todule_android.provider.ToduleProvider"
             android:exported="false">
         </provider>
