@@ -123,10 +123,6 @@ public class TimeReminderFragment extends Fragment {
         return view;
     }
 
-    private void ShowTos(String msg) {
-        Toast.makeText(getActivity(), msg,
-                Toast.LENGTH_LONG).show();
-    }
 
     public long getOnlyHoursAndMins(int dayHourMin,int t){
         if (t == 1) return dayHourMin * 60 * 60 * 1000; // convert hours to millis
@@ -162,11 +158,20 @@ public class TimeReminderFragment extends Fragment {
                     editor.putInt("minutes", myCalendar.get(Calendar.MINUTE));
                     editor.putInt("days", Integer.parseInt(timeViewDays.getText().toString()));
                     editor.apply();
-                    ShowTos("Reminder updated "+timeViewDays.getText().toString() + " Days and "
-                            + myCalendar.get(Calendar.HOUR_OF_DAY)+":"+myCalendar.get(Calendar.MINUTE));
+                    Toast.makeText(getActivity(),
+                            "Reminder updated to "
+                                    +timeViewDays.getText().toString()
+                                    +" Days and "
+                                    +myCalendar.get(Calendar.HOUR_OF_DAY)
+                                    +" Hours and "
+                                    +myCalendar.get(Calendar.MINUTE)
+                                    +" Minutes." ,
+                            Toast.LENGTH_LONG).show();
                     return true;
                 }else{
-                    ShowTos("Error in input of Days !");
+                    Toast.makeText(getActivity(),
+                            "Error in input of Days !",
+                            Toast.LENGTH_LONG).show();
                 }
         }
         return super.onOptionsItemSelected(item);
