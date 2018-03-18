@@ -4,13 +4,15 @@ import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import com.danlls.daniel.todule_android.BuildConfig;
+
 
 /**
  * Created by danieL on 7/31/2017.
  */
 
 public final class ToduleDBContract {
-    public static final String AUTHORITY = "com.danlls.todule.provider";
+    public static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".provider";
     public static final String SCHEME = "content://";
     public static final String SLASH = "/";
 

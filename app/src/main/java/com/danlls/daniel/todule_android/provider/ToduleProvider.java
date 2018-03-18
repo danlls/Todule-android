@@ -30,12 +30,12 @@ public class ToduleProvider extends ContentProvider{
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
-        sUriMatcher.addURI("com.danlls.todule.provider", "todo_entry", ENTRY_LIST);
-        sUriMatcher.addURI("com.danlls.todule.provider", "todo_entry/#", ENTRY_ID);
-        sUriMatcher.addURI("com.danlls.todule.provider", "todo_label", LABEL_LIST);
-        sUriMatcher.addURI("com.danlls.todule.provider", "todo_label/#", LABEL_ID);
-        sUriMatcher.addURI("com.danlls.todule.provider", "todo_notification", NOTIFICATION_LIST);
-        sUriMatcher.addURI("com.danlls.todule.provider", "todo_notification/#", NOTIFICATION_ID);
+        sUriMatcher.addURI(ToduleDBContract.AUTHORITY, "todo_entry", ENTRY_LIST);
+        sUriMatcher.addURI(ToduleDBContract.AUTHORITY, "todo_entry/#", ENTRY_ID);
+        sUriMatcher.addURI(ToduleDBContract.AUTHORITY, "todo_label", LABEL_LIST);
+        sUriMatcher.addURI(ToduleDBContract.AUTHORITY, "todo_label/#", LABEL_ID);
+        sUriMatcher.addURI(ToduleDBContract.AUTHORITY, "todo_notification", NOTIFICATION_LIST);
+        sUriMatcher.addURI(ToduleDBContract.AUTHORITY, "todo_notification/#", NOTIFICATION_ID);
     }
 
     private ToduleDBHelper tOpenHelper;
