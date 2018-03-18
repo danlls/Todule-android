@@ -1,8 +1,10 @@
 package com.danlls.daniel.todule_android.activities;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -34,12 +36,18 @@ public class MainActivity extends AppCompatActivity implements
     private DrawerLayout mDrawerLayout;
     private NavigationView navigationView;
     private ActionBarDrawerToggle mDrawerToggle;
+    SharedPreferences sharedPreferences;
+    public static long timing;
+    public static int Thours;
+    public static int Tmins;
+    public static int Tdays;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         this.context = this;
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
@@ -76,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {;
+            public void onClick(View view) {
                 ToduleAddFragment frag = new ToduleAddFragment();
                 Bundle args = new Bundle();
                 args.putString("mode", "create_entry");
@@ -233,14 +241,20 @@ public class MainActivity extends AppCompatActivity implements
                                 .commit();
                         mDrawerLayout.closeDrawer(GravityCompat.START);
                         break;
+                    case R.id.nav_time:
+                        navigationView.setCheckedItem(item.getItemId());
+                        TimeReminderFragment timeFrag = TimeReminderFragment.newInstance();
+                        getSupportFragmentManager().beginTransaction()
+                            .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top, R.anim.enter_from_top, R.anim.exit_to_bottom)
+                            .replace(R.id.fragment_container, timeFrag, "update_timing")
+                            .commit();
+                        mDrawerLayout.closeDrawer(GravityCompat.START);
+                        break;
                 }
                 return true;
         }
         return true;
     }
-
-
-
 
 
     @Override
@@ -249,7 +263,6 @@ public class MainActivity extends AppCompatActivity implements
         ToduleAddFragment toduleAddFragment = (ToduleAddFragment) getSupportFragmentManager().findFragmentByTag("add_frag");
         toduleAddFragment.setLabel(id);
     }
-
 
     @Override
     public void onActionModeStarted(ActionMode mode) {
@@ -271,6 +284,24 @@ public class MainActivity extends AppCompatActivity implements
         window.clearFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (sharedPreferences.contains("timing")){
+            timing = sharedPreferences.getLong("timing",60 * 60 * 1000);
+            Tmins = sharedPreferences.getInt("minutes",00);
+            Thours = sharedPreferences.getInt("hours",01);
+            Tdays = sharedPreferences.getInt("days",00);
+        }else {
+            timing = 60 * 60 * 1000;
+            Thours = 01;
+            Tmins = 00;
+            Tdays = 00;
+        }
+
+    }
+
 }
 
 

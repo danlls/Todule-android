@@ -45,6 +45,9 @@
     <string name="bin_emptied">Bin emptied</string>
     <string name="expired_header">You have expired todule</string>
     <string name="go_arrow">Go</string>
+    <string name="nav_time">Reminder</string>
+    <string name="confirm_action">Confirm</string>
+    <string name="much_time">How much time do you want to be notified before your deadline ?</string>
     <string name="label_tag_hint">Tag (max. 25 characters)</string>
     <string name="empty_view_text">Nothing in here :(</string>
 </resources>
