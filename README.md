@@ -1,7 +1,5 @@
 # Todule-android
-A todo-list Android app to help you manage and track your todo-list easily! <br/>
-
-Note: This project only works with the official SendLink Windows (https://github.com/danlls/sendlink_windows)
+A todo-list Android app to help you manage and track your todo-list easily!
 
 ## Installation
 The app is now available on Google Play.
