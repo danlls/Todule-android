@@ -57,6 +57,8 @@ public class MainActivityTest {
     @Before
     public void setUp() throws Exception{
         Espresso.closeSoftKeyboard();
+        mainActivityActivityTestRule.getActivity().getSupportFragmentManager()
+                .beginTransaction();
     }
 
     @Test
